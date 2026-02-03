@@ -16,9 +16,9 @@ class TodoRepository(BaseRepository[Todo]):
         ).first()
 
     def get_all_by_planner(
-        self, 
-        db: Session, 
-        planner_id: uuid.UUID, 
+        self,
+        db: Session,
+        planner_id: uuid.UUID,
         status: Optional[str] = None,
         priority: Optional[str] = None,
         sort_by: str = "order_index"

@@ -34,8 +34,6 @@ class BaseRepository(Generic[T]):
         return True
 
     def get_pk_name(self):
-        # Default to id, but some models use planner_id, todo_id etc.
-        # This is a bit simplified, but works for our models.
         if hasattr(self.model, "planner_id"): return "planner_id"
         if hasattr(self.model, "todo_id"): return "todo_id"
         return "id"

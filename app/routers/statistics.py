@@ -6,15 +6,14 @@ from typing import List
 from app.database import get_db
 from app.models.models import User
 from app.schemas.schemas import (
-    ResponseModel, 
-    DailyStatisticsResponse, 
+    ResponseModel,
+    DailyStatisticsResponse,
     WeeklyStatisticsResponse
 )
 from app.services.statistics_service import statistics_service
 
 router = APIRouter()
 
-# Temporary: Helper to get the first user until auth is implemented
 def get_current_user(db: Session = Depends(get_db)) -> User:
     user = db.query(User).first()
     if not user:

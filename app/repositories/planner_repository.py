@@ -15,24 +15,24 @@ class PlannerRepository(BaseRepository[Planner]):
         ).first()
 
     def get_paginated_by_user(
-        self, 
-        db: Session, 
-        user_id: any, 
+        self,
+        db: Session,
+        user_id: any,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
-        skip: int = 0, 
+        skip: int = 0,
         limit: int = 10
     ) -> (List[Planner], int):
         query = db.query(Planner).filter(Planner.user_id == user_id)
-        
+
         if start_date:
             query = query.filter(Planner.plan_date >= start_date)
         if end_date:
             query = query.filter(Planner.plan_date <= end_date)
-            
+
         total_items = query.count()
         planners = query.order_by(Planner.plan_date.desc()).offset(skip).limit(limit).all()
-        
+
         return planners, total_items
 
 planner_repo = PlannerRepository()

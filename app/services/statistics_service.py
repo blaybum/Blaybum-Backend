@@ -6,20 +6,6 @@ from app.models.models import User, Todo, Planner
 
 class StatisticsService:
     def get_daily_statistics(self, db: Session, user: User, target_date: date):
-        # We need a combination of todo and planner. 
-        # Repository handles specific model. Service handles logic.
-        # But for efficiency, we might want a specific query.
-        # Let's use the basic one for now.
-        
-        # In current routers/statistics.py:
-        # todos = db.query(Todo).join(Planner).filter(
-        #     Planner.user_id == user.id,
-        #     Planner.plan_date == target_date
-        # ).all()
-        
-        # I'll add a method to todo_repo or just use the repositories.
-        # planner_repo doesn't have a direct "get todos for date".
-        # Let's get the planner first.
         planner = planner_repo.get_by_user_and_date(db, user.id, target_date)
         if not planner:
              return {
@@ -35,7 +21,7 @@ class StatisticsService:
             }
 
         todos = todo_repo.get_all_by_planner(db, planner.planner_id)
-        
+
         stats = {
             "date": target_date,
             "total_todos": len(todos),
@@ -62,12 +48,8 @@ class StatisticsService:
 
     def get_weekly_statistics(self, db: Session, user: User, start_date: date):
         end_date = start_date + timedelta(days=6)
-        
-        # This one is better as a single query for performance
-        # results = db.query(Todo, Planner.plan_date).join(Planner).filter(...)
-        # I'll implement this efficiently in the service for now, 
-        # using a query that could be moved to repository later.
-        
+
+
         results = db.query(Todo, Planner.plan_date).join(Planner).filter(
             Planner.user_id == user.id,
             Planner.plan_date >= start_date,

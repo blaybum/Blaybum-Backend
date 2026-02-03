@@ -10,7 +10,6 @@ from app.services.todo_service import todo_service
 
 router = APIRouter()
 
-# Temporary: Helper to get the first user until auth is implemented
 def get_current_user(db: Session = Depends(get_db)) -> User:
     user = db.query(User).first()
     if not user:
@@ -20,7 +19,7 @@ def get_current_user(db: Session = Depends(get_db)) -> User:
 
 @router.post("/", response_model=ResponseModel[TodoResponse], status_code=status.HTTP_201_CREATED)
 async def create_todo(
-    request: TodoCreateRequest, 
+    request: TodoCreateRequest,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
@@ -41,7 +40,7 @@ async def get_todos(
 
 @router.get("/{todo_id}", response_model=ResponseModel[TodoResponse], status_code=status.HTTP_200_OK)
 async def get_todo(
-    todo_id: uuid.UUID, 
+    todo_id: uuid.UUID,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
@@ -50,8 +49,8 @@ async def get_todo(
 
 @router.put("/{todo_id}", response_model=ResponseModel[TodoResponse], status_code=status.HTTP_200_OK)
 async def update_todo(
-    todo_id: uuid.UUID, 
-    request: TodoUpdateRequest, 
+    todo_id: uuid.UUID,
+    request: TodoUpdateRequest,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
@@ -60,8 +59,8 @@ async def update_todo(
 
 @router.patch("/{todo_id}", response_model=ResponseModel[TodoResponse], status_code=status.HTTP_200_OK)
 async def patch_todo(
-    todo_id: uuid.UUID, 
-    request: TodoUpdateRequest, 
+    todo_id: uuid.UUID,
+    request: TodoUpdateRequest,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
@@ -70,8 +69,8 @@ async def patch_todo(
 
 @router.patch("/{todo_id}/reorder", response_model=ResponseModel[TodoResponse], status_code=status.HTTP_200_OK)
 async def reorder_todos(
-    todo_id: uuid.UUID, 
-    request: TodoUpdateRequest, 
+    todo_id: uuid.UUID,
+    request: TodoUpdateRequest,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
@@ -80,7 +79,7 @@ async def reorder_todos(
 
 @router.delete("/{todo_id}", status_code=status.HTTP_200_OK)
 async def delete_todo(
-    todo_id: uuid.UUID, 
+    todo_id: uuid.UUID,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):

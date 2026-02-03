@@ -6,10 +6,10 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.schemas.schemas import (
-    ResponseModel, 
-    PlannerCreateRequest, 
-    PlannerResponse, 
-    PlannerUpdateRequest, 
+    ResponseModel,
+    PlannerCreateRequest,
+    PlannerResponse,
+    PlannerUpdateRequest,
     PaginatedResponseModel
 )
 from app.models.models import User
@@ -17,7 +17,6 @@ from app.services.planner_service import planner_service
 
 router = APIRouter()
 
-# Temporary: Helper to get the first user until auth is implemented
 def get_current_user(db: Session = Depends(get_db)) -> User:
     user = db.query(User).first()
     if not user:
@@ -27,7 +26,7 @@ def get_current_user(db: Session = Depends(get_db)) -> User:
 
 @router.post("/", response_model=ResponseModel[PlannerResponse], status_code=status.HTTP_201_CREATED)
 async def create_planner(
-    request: PlannerCreateRequest, 
+    request: PlannerCreateRequest,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
@@ -36,7 +35,7 @@ async def create_planner(
 
 @router.get("/{planner_id}", response_model=ResponseModel[PlannerResponse], status_code=status.HTTP_200_OK)
 async def get_planner(
-    planner_id: uuid.UUID, 
+    planner_id: uuid.UUID,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
@@ -52,9 +51,9 @@ async def get_planners(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
-    from datetime import date # Need this for type hint
+    from datetime import date
     planners, total_items = planner_service.get_planners(db, user, start_date, end_date, page, limit)
-    
+
     import math
     total_pages = math.ceil(total_items / limit) if total_items > 0 else 0
 
@@ -71,8 +70,8 @@ async def get_planners(
 
 @router.put("/{planner_id}", response_model=ResponseModel[PlannerResponse], status_code=status.HTTP_200_OK)
 async def update_planner(
-    planner_id: uuid.UUID, 
-    request: PlannerUpdateRequest, 
+    planner_id: uuid.UUID,
+    request: PlannerUpdateRequest,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
@@ -81,7 +80,7 @@ async def update_planner(
 
 @router.delete("/{planner_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_planner(
-    planner_id: uuid.UUID, 
+    planner_id: uuid.UUID,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):

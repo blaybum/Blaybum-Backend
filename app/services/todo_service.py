@@ -14,7 +14,7 @@ class TodoService:
             raise HTTPException(status_code=404, detail="플래너를 찾을 수 없거나 접근 권한이 없습니다.")
 
         max_order = todo_repo.get_max_order_index(db, request.planner_id)
-        
+
         new_todo_data = {
             "planner_id": request.planner_id,
             "title": request.title,
@@ -24,7 +24,6 @@ class TodoService:
             "priority": request.priority,
             "order_index": max_order + 1
         }
-        # Oops, I need to check the Todo model again.
         return todo_repo.create(db, new_todo_data)
 
     def get_todo(self, db: Session, user: User, todo_id: uuid.UUID):
@@ -37,11 +36,10 @@ class TodoService:
         return todo
 
     def get_todos(self, db: Session, user: User, planner_id: uuid.UUID, status_str: str, priority: str, sort_by: str):
-        # Verify planner ownership
         planner = planner_repo.get_by_id(db, planner_id)
         if not planner or planner.user_id != user.id:
             raise HTTPException(status_code=404, detail="플래너를 찾을 수 없거나 접근 권한이 없습니다.")
-            
+
         return todo_repo.get_all_by_planner(db, planner_id, status_str, priority, sort_by)
 
     def update_todo(self, db: Session, user: User, todo_id: uuid.UUID, request: TodoUpdateRequest):
@@ -52,7 +50,7 @@ class TodoService:
     def patch_todo(self, db: Session, user: User, todo_id: uuid.UUID, request: TodoUpdateRequest):
         todo = self.get_todo(db, user, todo_id)
         update_data = request.dict(exclude_unset=True)
-        
+
         if "status" in update_data and update_data["status"] == "completed" and todo.status != "completed":
             todo.completed_at = func.now()
         elif "status" in update_data and update_data["status"] != "completed":

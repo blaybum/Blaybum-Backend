@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 from sqlalchemy import (
-    Boolean, Column, DateTime, ForeignKey, String, Text, 
+    Boolean, Column, DateTime, ForeignKey, String, Text,
     Date, Time, Integer, Enum, UniqueConstraint, Index
 )
 from sqlalchemy.dialects.postgresql import UUID
@@ -81,7 +81,6 @@ class Planner(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
-    # Relationships
     user = relationship("User", back_populates="planners")
     todos = relationship("Todo", back_populates="planner", cascade="all, delete-orphan")
 
@@ -108,7 +107,6 @@ class Todo(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
-    # Relationships
     planner = relationship("Planner", back_populates="todos")
 
     __table_args__ = (
