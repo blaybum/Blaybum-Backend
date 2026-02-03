@@ -38,7 +38,7 @@ app.add_middleware(
     allow_headers=config.cors.ALLOWED_HEADERS,
 )
 
-app.include_router(api_v1_router, prefix="/api/v1")
+app.include_router(api_v1_router)
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
