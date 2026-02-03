@@ -12,12 +12,8 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-current_dir = Path(__file__).parent.parent
-sys.path.insert(0, str(current_dir))
+from app.database import Base
 
-from database import Base
-
-# --- Enums ---
 class DayOfWeek(str, enum.Enum):
     MON = "MON"
     TUE = "TUE"
@@ -105,6 +101,8 @@ class Todo(Base):
     scheduled_time = Column(Time, nullable=True)
     priority = Column(Enum(Priority), nullable=True)
     status = Column(Enum(TodoStatus), default=TodoStatus.pending)
+    estimated_duration_minutes = Column(Integer, nullable=True)
+    actual_duration_minutes = Column(Integer, nullable=True)
     completed_at = Column(DateTime(timezone=True), nullable=True)
     order_index = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

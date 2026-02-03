@@ -3,7 +3,7 @@ import os
 from functools import lru_cache
 from typing import List
 
-from settings import settings
+from app.settings import settings
 
 
 class DatabaseConfig:
