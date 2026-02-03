@@ -2,7 +2,8 @@
 
 echo "PostgreSQL Status Check..."
 
-cd ..
+# 프로젝트 루트로 이동
+cd "$(dirname "$0")/.."
 
 echo "Docker containers:"
 docker-compose ps
