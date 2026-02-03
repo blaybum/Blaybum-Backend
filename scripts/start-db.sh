@@ -2,7 +2,7 @@
 
 echo "Starting PostgreSQL with Docker Compose..."
 
-cd ..
+cd "$(dirname "$0")/.."
 
 docker-compose up -d postgres
 
@@ -16,8 +16,6 @@ if [ $? -eq 0 ]; then
     echo "PostgreSQL is ready!"
     echo "Database: blaybum_db"
     echo "User: blaybum_user"
-    echo "Host: localhost:5432"
-    echo ""
     echo "pgAdmin is also available at http://localhost:5050"
     echo "Email: admin@blaybum.com"
     echo "Password: admin123"
