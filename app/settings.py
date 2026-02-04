@@ -29,6 +29,10 @@ class Settings(BaseSettings):
         default=30, alias="ACCESS_TOKEN_EXPIRE_MINUTES"
     )
 
+    redis_host: str = Field(default="localhost", alias="REDIS_HOST")
+    redis_port: int = Field(default=6379, alias="REDIS_PORT")
+    redis_password: str = Field(default="", alias="REDIS_PASSWORD")
+
     cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
 
 
