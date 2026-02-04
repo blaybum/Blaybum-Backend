@@ -113,3 +113,24 @@ class Todo(Base):
         Index('idx_todos_planner', 'planner_id'),
         Index('idx_todos_status', 'status'),
     )
+
+class Pomo(Base):
+    __tablename__ = "pomo"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    planner_id = Column(UUID(as_uuid=True), ForeignKey("planners.planner_id", ondelete="SET NULL"), nullable=True)
+    todo_id = Column(UUID(as_uuid=True), ForeignKey("todos.todo_id", ondelete="SET NULL"), nullable=True)
+    real_start_time = Column(DateTime(timezone=True), server_default=func.now())
+    real_end_time = Column(DateTime(timezone=True), server_default=func.now())
+    edit_start_time = Column(DateTime(timezone=True), server_default=func.now())
+    edit_end_time = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    __table_args__ = (
+        Index('idx_pomo_user', 'user_id'),
+        Index('idx_pomo_todo', 'todo_id'),
+    )
