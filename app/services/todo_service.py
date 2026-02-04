@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.repositories.todo_repository import todo_repo
 from app.repositories.planner_repository import planner_repo
-from app.schemas.schemas import TodoCreateRequest, TodoUpdateRequest
+from app.schemas.todo_schemas import TodoCreateRequest, TodoUpdateRequest
 from app.models.models import User
 from fastapi import HTTPException, status
 import uuid

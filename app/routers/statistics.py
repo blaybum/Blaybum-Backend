@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from datetime import date
-from typing import List
 
 from app.database import get_db
 from app.models.models import User
-from app.schemas.schemas import (
-    ResponseModel,
+from app.schemas.common_schemas import ResponseModel
+from app.schemas.statistics_schemas import (
     DailyStatisticsResponse,
     WeeklyStatisticsResponse
 )

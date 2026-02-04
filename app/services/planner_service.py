@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.repositories.planner_repository import planner_repo
-from app.schemas.schemas import PlannerCreateRequest, PlannerUpdateRequest
+from app.schemas.planner_schemas import PlannerCreateRequest, PlannerUpdateRequest
 from app.models.models import DayOfWeek, User
 from fastapi import HTTPException, status
 import uuid
