@@ -4,8 +4,8 @@ from datetime import date
 
 from app.database import get_db
 from app.models.models import User
-from app.schemas.common_schemas import ResponseModel
-from app.schemas.statistics_schemas import (
+from app.schemas import (
+    ResponseModel,
     DailyStatisticsResponse,
     WeeklyStatisticsResponse
 )

@@ -3,7 +3,6 @@ from datetime import date, datetime
 from pydantic import BaseModel, ConfigDict, Field
 import uuid
 
-
 #Request
 class PlannerCreateRequest(BaseModel):
     plan_date: date

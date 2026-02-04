@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.schemas.planner_schemas import (
+from app.schemas import (
     ResponseModel,
     PlannerCreateRequest,
     PlannerResponse,
