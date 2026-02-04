@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.repositories.planner_repository import planner_repo
-from app.schemas.planner_schemas import PlannerCreateRequest, PlannerUpdateRequest
+from app.schemas import PlannerCreateRequest, PlannerUpdateRequest
 from app.models.models import DayOfWeek, User
 from fastapi import HTTPException, status
 import uuid
@@ -45,7 +45,7 @@ class PlannerService:
 
     def update_planner(self, db: Session, user: User, planner_id: uuid.UUID, request: PlannerUpdateRequest):
         planner = self.get_planner(db, user, planner_id)
-        update_data = request.dict(exclude_unset=True)
+        update_data = request.model_dump(exclude_unset=True)
         if not update_data:
             raise HTTPException(status_code=400, detail="수정할 데이터가 제공되지 않았습니다.")
         return planner_repo.update(db, planner, update_data)

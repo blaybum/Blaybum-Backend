@@ -18,7 +18,7 @@ class TodoCreateRequest(BaseModel):
     scheduled_time: Optional[time] = None
     estimated_duration_minutes: Optional[int] = Field(None, ge=0)
     priority: PriorityEnum = Field(PriorityEnum.medium)
-    
+
 class TodoUpdateRequest(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
@@ -44,8 +44,4 @@ class TodoResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
-        json_encoders = {
-            time: lambda v: v.strftime("%H:%M:%S")
-        }
+    model_config = ConfigDict(from_attributes=True)

@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.repositories.todo_repository import todo_repo
 from app.repositories.planner_repository import planner_repo
-from app.schemas.todo_schemas import TodoCreateRequest, TodoUpdateRequest
+from app.schemas import TodoCreateRequest, TodoUpdateRequest
 from app.models.models import User
 from fastapi import HTTPException, status
 import uuid
@@ -44,12 +44,12 @@ class TodoService:
 
     def update_todo(self, db: Session, user: User, todo_id: uuid.UUID, request: TodoUpdateRequest):
         todo = self.get_todo(db, user, todo_id)
-        update_data = request.dict(exclude_unset=True)
+        update_data = request.model_dump(exclude_unset=True)
         return todo_repo.update(db, todo, update_data)
 
     def patch_todo(self, db: Session, user: User, todo_id: uuid.UUID, request: TodoUpdateRequest):
         todo = self.get_todo(db, user, todo_id)
-        update_data = request.dict(exclude_unset=True)
+        update_data = request.model_dump(exclude_unset=True)
 
         if "status" in update_data and update_data["status"] == "completed" and todo.status != "completed":
             todo.completed_at = func.now()
