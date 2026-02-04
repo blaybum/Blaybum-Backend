@@ -1,17 +1,19 @@
 import sys
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, HTTPException
+sys.path.insert(0, str(Path(__file__).parent))
+
+from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-
-sys.path.insert(0, str(Path(__file__).parent))
-
-from database import Base, engine, get_db
-from models.models import Post, User
-from settings import Colors, settings
-from config import config
+from app.database import Base, engine, get_db
+from app.models.models import Post, User
+from app.settings import Colors, settings
+from app.config import config
+from app.routers.api_v1 import api_v1_router
 
 config.logging.setup_logging()
 
@@ -40,6 +42,28 @@ app.add_middleware(
     allow_methods=config.cors.ALLOWED_METHODS,
     allow_headers=config.cors.ALLOWED_HEADERS,
 )
+
+app.include_router(api_v1_router)
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "success": False,
+            "data": exc.detail
+        }
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "success": False,
+            "data": exc.errors()
+        }
+    )
 
 @app.get("/health")
 async def health_check():

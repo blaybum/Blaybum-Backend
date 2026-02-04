@@ -3,14 +3,14 @@ import os
 from functools import lru_cache
 from typing import List
 
-from settings import settings
+from app.settings import settings
 
 
 class DatabaseConfig:
     SQLALCHEMY_DATABASE_URL = settings.database_url
     SQLALCHEMY_ECHO = settings.debug
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
+
     POOL_SIZE = 10
     MAX_OVERFLOW = 20
     POOL_PRE_PING = True
@@ -22,7 +22,7 @@ class SecurityConfig:
     ALGORITHM = settings.algorithm
     ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
     REFRESH_TOKEN_EXPIRE_DAYS = 7
-    
+
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_REQUIRE_UPPERCASE = True
     PASSWORD_REQUIRE_LOWERCASE = True
@@ -41,7 +41,7 @@ class LoggingConfig:
     LEVEL = logging.INFO if not settings.debug else logging.DEBUG
     FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
-    
+
     @staticmethod
     def setup_logging():
         logging.basicConfig(
@@ -56,7 +56,7 @@ class APIConfig:
     DOCS_URL = "/docs" if settings.debug else None
     REDOC_URL = "/redoc" if settings.debug else None
     OPENAPI_URL = "/openapi.json" if settings.debug else None
-    
+
     DEFAULT_PAGE_SIZE = 10
     MAX_PAGE_SIZE = 100
 
@@ -65,7 +65,7 @@ class FileConfig:
     MAX_UPLOAD_SIZE = 10 * 1024 * 1024
     ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".pdf", ".txt"}
     UPLOAD_FOLDER = "uploads"
-    
+
     @staticmethod
     def get_upload_path():
         upload_path = os.path.join(os.getcwd(), FileConfig.UPLOAD_FOLDER)
@@ -84,12 +84,12 @@ class EnvironmentConfig:
     @lru_cache()
     def is_production():
         return os.getenv("ENVIRONMENT", "development").lower() == "production"
-    
+
     @staticmethod
-    @lru_cache() 
+    @lru_cache()
     def is_development():
         return not EnvironmentConfig.is_production()
-    
+
     @staticmethod
     @lru_cache()
     def is_testing():
