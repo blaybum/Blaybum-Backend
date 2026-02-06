@@ -10,7 +10,9 @@ from app.schemas import (
     PomoResponse, 
     PomoUpdateRequest,
     ConcentrationCreate,
-    ConcentrationResponse
+    ConcentrationResponse,
+    PomoCreateResponse,
+    PomoUpdateResponse
 )
 from app.services import pomo_service
 
@@ -23,7 +25,7 @@ def get_current_user(db: Session = Depends(get_db)) -> User:
         raise HTTPException(status_code=404, detail="유저를 찾을 수 없습니다.")
     return user
 
-@router.post("/", response_model=ResponseModel[PomoResponse], status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ResponseModel[PomoCreateResponse], status_code=status.HTTP_201_CREATED)
 async def create_pomo(
     request: PomoCreateRequest,
     db: Session = Depends(get_db),
@@ -64,7 +66,7 @@ async def get_pomo(
     result = pomo_service.get_pomo(db, user, pomo_id)
     return {"success": True, "data": result}
 
-@router.patch("/{pomo_id}", response_model=ResponseModel[PomoResponse])
+@router.patch("/{pomo_id}", response_model=ResponseModel[PomoUpdateResponse])
 async def update_pomo(
     pomo_id: uuid.UUID,
     request: PomoUpdateRequest,

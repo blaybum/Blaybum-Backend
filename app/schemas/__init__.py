@@ -28,8 +28,10 @@ from .pomo_schemas import (
     PomoCreateRequest,
     PomoResponse,
     PomoUpdateRequest,
+    PomoCreateResponse,
     ConcentrationCreate,
-    ConcentrationResponse
+    ConcentrationResponse,
+    PomoUpdateResponse,
 )
 
 
@@ -55,6 +57,8 @@ __all__ = [
     "PomoCreateRequest",
     "PomoResponse",
     "PomoUpdateRequest",
+    "PomoCreateResponse",
+    "PomoUpdateResponse",
     "ConcentrationCreate",
     "ConcentrationResponse",
 ]
