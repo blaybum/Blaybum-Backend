@@ -9,7 +9,9 @@ from app.schemas import ResponseModel, PaginatedResponseModel
 from app.schemas.pomo_schemas import (
     PomoCreateRequest, 
     PomoResponse, 
-    PomoUpdateRequest
+    PomoUpdateRequest,
+    ConcentrationCreate,
+    ConcentrationResponse
 )
 from app.services.pomo_service import pomo_service
 
@@ -81,3 +83,13 @@ async def delete_pomo(
 ):
     pomo_service.delete_pomo(db, user, pomo_id)
     return
+
+@router.post("/{pomo_id}/concentration", response_model=ResponseModel[ConcentrationResponse], status_code=status.HTTP_201_CREATED)
+async def add_concentration_log(
+    pomo_id: uuid.UUID,
+    request: ConcentrationCreate,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    result = pomo_service.add_concentration_log(db, user, pomo_id, request)
+    return {"success": True, "data": result}

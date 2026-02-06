@@ -134,3 +134,17 @@ class Pomo(Base):
         Index('idx_pomo_user', 'user_id'),
         Index('idx_pomo_todo', 'todo_id'),
     )
+
+class UsageEventType(str, enum.Enum):
+    PICK_UP = "PICK_UP"
+    PUT_DOWN = "PUT_DOWN"
+
+class Concentration(Base):
+    __tablename__ = "concentration"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    pomo_id = Column(UUID(as_uuid=True), ForeignKey("pomo.id", ondelete="CASCADE"), nullable=False)
+    event_type = Column(Enum(UsageEventType), nullable=False)
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+
+    pomo = relationship("Pomo", backref="concentration_logs")

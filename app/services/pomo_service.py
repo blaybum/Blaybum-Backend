@@ -3,9 +3,10 @@ from typing import List, Tuple
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app.models.models import User, Pomo
+from app.models.models import User, Pomo, Concentration
 from app.repositories.pomo_repository import pomo_repo
-from app.schemas.pomo_schemas import PomoCreateRequest, PomoUpdateRequest
+from app.repositories.concentration_repository import concentration_repo
+from app.schemas.pomo_schemas import PomoCreateRequest, PomoUpdateRequest, ConcentrationCreate
 
 class PomoService:
     def create_pomo(self, db: Session, user: User, request: PomoCreateRequest) -> Pomo:
@@ -43,5 +44,16 @@ class PomoService:
     def delete_pomo(self, db: Session, user: User, pomo_id: uuid.UUID) -> None:
         pomo = self.get_pomo(db, user, pomo_id)
         pomo_repo.delete(db, pomo)
+
+    def add_concentration_log(
+        self, db: Session, user: User, pomo_id: uuid.UUID, request: ConcentrationCreate
+    ) -> Concentration:
+        pomo = self.get_pomo(db, user, pomo_id)
+        log_data = {
+            "pomo_id": pomo.id,
+            "event_type": request.event_type,
+            "timestamp": request.timestamp or None
+        }
+        return concentration_repo.create(db, log_data)
 
 pomo_service = PomoService()

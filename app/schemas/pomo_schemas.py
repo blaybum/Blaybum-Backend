@@ -8,6 +8,20 @@ from pydantic import BaseModel, ConfigDict
 class UsageEventTypeEnum(str, Enum):
     PICK_UP = "PICK_UP"
     PUT_DOWN = "PUT_DOWN"
+    
+# Concentration Request
+class ConcentrationCreate(BaseModel):
+    event_type: UsageEventTypeEnum
+    timestamp: Optional[datetime] = None
+
+# Concentration Response
+class ConcentrationResponse(BaseModel):
+    id: uuid.UUID
+    pomo_id: uuid.UUID
+    event_type: UsageEventTypeEnum
+    timestamp: datetime
+
+    model_config = ConfigDict(from_attributes=True)
 
 # Pomo Request
 class PomoCreateRequest(BaseModel):
