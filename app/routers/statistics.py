@@ -6,8 +6,10 @@ from app.database import get_db
 from app.models import User
 from app.schemas import (
     ResponseModel,
-    DailyStatisticsResponse,
-    WeeklyStatisticsResponse
+    PlannerDailyStatisticsResponse,
+    PlannerWeeklyStatisticsResponse,
+    PomoDailyStatisticsResponse,
+    PomoMeStatisticsResponse
 )
 from app.services import statistics_service
 
@@ -20,7 +22,7 @@ def get_current_user(db: Session = Depends(get_db)) -> User:
         raise HTTPException(status_code=404, detail="유저를 찾을 수 없습니다.")
     return user
 
-@router.get("/planner/daily", response_model=ResponseModel[DailyStatisticsResponse])
+@router.get("/planner/daily", response_model=ResponseModel[PlannerDailyStatisticsResponse])
 async def get_planner_daily_statistics(
     target_date: date = Query(..., alias="date"),
     db: Session = Depends(get_db),
@@ -29,11 +31,28 @@ async def get_planner_daily_statistics(
     result = statistics_service.get_planner_daily_statistics(db, user, target_date)
     return {"success": True, "data": result}
 
-@router.get("/planner/weekly", response_model=ResponseModel[WeeklyStatisticsResponse])
+@router.get("/planner/weekly", response_model=ResponseModel[PlannerWeeklyStatisticsResponse])
 async def get_planner_weekly_statistics(
     start_date: date = Query(..., description="주간 시작 날짜 (YYYY-MM-DD)"),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
     result = statistics_service.get_planner_weekly_statistics(db, user, start_date)
+    return {"success": True, "data": result}
+
+@router.get("/pomo/daily", response_model=ResponseModel[PomoDailyStatisticsResponse])
+async def get_pomo_daily_statistics(
+    target_date: date = Query(..., alias="date"),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    result = statistics_service.get_pomo_daily_statistics(db, user, target_date)
+    return {"success": True, "data": result}
+
+@router.get("/pomo/me", response_model=ResponseModel[PomoMeStatisticsResponse])
+async def get_pomo_me_statistics(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    result = statistics_service.get_pomo_me_statistics(db, user)
     return {"success": True, "data": result}

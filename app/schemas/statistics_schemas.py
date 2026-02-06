@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 from pydantic import BaseModel
 from datetime import date
 
@@ -18,17 +18,29 @@ class DailyBreakdown(BaseModel):
     completed: int
 
 #Response
-class DailyStatisticsResponse(BaseModel):
+class PlannerDailyStatisticsResponse(BaseModel):
     date: date
     total_todos: int
     completed_todos: int
     completion_rate: float
     by_priority: PriorityBreakdown
 
-class WeeklyStatisticsResponse(BaseModel):
+class PlannerWeeklyStatisticsResponse(BaseModel):
     week_start: date
     week_end: date
     total_todos: int
     completed_todos: int
     completion_rate: float
     daily_breakdown: List[DailyBreakdown]
+
+class PomoDailyStatisticsResponse(BaseModel):
+    date: date
+    total_study_time_minutes: int
+    pomo_count: int
+    completed_todos: int
+
+class PomoMeStatisticsResponse(BaseModel):
+    total_study_time_minutes: int
+    average_daily_minutes: int
+    total_pomo_count: int
+    best_day: Optional[date] = None
