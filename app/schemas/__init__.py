@@ -10,6 +10,7 @@ from .planner_schemas import (
 )
 from .statistics_schemas import (
     PriorityStat,
+    PriorityBreakdown,
     DailyBreakdown,
     DailyStatisticsResponse,
     WeeklyStatisticsResponse
@@ -36,6 +37,7 @@ __all__ = [
     "PlannerResponse",
     "PlannerUpdateRequest",
     "PriorityStat",
+    "PriorityBreakdown",
     "DailyBreakdown",
     "DailyStatisticsResponse",
     "WeeklyStatisticsResponse",

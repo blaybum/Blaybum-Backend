@@ -4,8 +4,13 @@ from datetime import date
 
 #Sub
 class PriorityStat(BaseModel):
-    total: int
-    completed: int
+    total: int = 0
+    completed: int = 0
+
+class PriorityBreakdown(BaseModel):
+    high: PriorityStat = PriorityStat()
+    medium: PriorityStat = PriorityStat()
+    low: PriorityStat = PriorityStat()
 
 class DailyBreakdown(BaseModel):
     date: date
@@ -18,7 +23,7 @@ class DailyStatisticsResponse(BaseModel):
     total_todos: int
     completed_todos: int
     completion_rate: float
-    by_priority: Dict[str, PriorityStat]
+    by_priority: PriorityBreakdown
 
 class WeeklyStatisticsResponse(BaseModel):
     week_start: date
