@@ -1,11 +1,12 @@
-import uuid
-from fastapi import APIRouter, Depends, status, Query
+import math
+from fastapi import APIRouter, Depends, status, Query, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import User
-from app.schemas import ResponseModel, PaginatedResponseModel
 from app.schemas import (
+    ResponseModel,
+    PaginatedResponseModel,
     PomoCreateRequest, 
     PomoResponse, 
     PomoUpdateRequest,
@@ -21,7 +22,6 @@ router = APIRouter()
 def get_current_user(db: Session = Depends(get_db)) -> User:
     user = db.query(User).first()
     if not user:
-        from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="유저를 찾을 수 없습니다.")
     return user
 
@@ -43,7 +43,6 @@ async def get_pomos(
 ):
     pomos, total_items = pomo_service.get_pomos(db, user, page, limit)
     
-    import math
     total_pages = math.ceil(total_items / limit) if total_items > 0 else 0
     
     return {

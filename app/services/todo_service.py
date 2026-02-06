@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.repositories import todo_repo, planner_repo
 from app.schemas import TodoCreateRequest, TodoUpdateRequest
-from app.models import User
+from app.models import User, Todo
 from fastapi import HTTPException, status
 import uuid
 
@@ -63,7 +63,6 @@ class TodoService:
             raise HTTPException(status_code=404, detail="플래너를 찾을 수 없거나 접근 권한이 없습니다.")
 
         try:
-            from app.models import Todo
             todo_ids = [order.todo_id for order in request.orders]
             order_map = {order.todo_id: order.order_index for order in request.orders}
             

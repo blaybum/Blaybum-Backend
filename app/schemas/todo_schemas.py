@@ -33,8 +33,6 @@ class TodoUpdateRequest(BaseModel):
     priority: Optional[PriorityEnum] = None
     status: Optional[str] = None
 
-# Reorder Request
-
 class TodoReorderRequest(BaseModel):
     planner_id: uuid.UUID
     orders: List[TodoOrder]

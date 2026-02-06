@@ -1,6 +1,6 @@
 import uuid
 from typing import List, Optional
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -19,7 +19,6 @@ router = APIRouter()
 def get_current_user(db: Session = Depends(get_db)) -> User:
     user = db.query(User).first()
     if not user:
-        from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="유저를 찾을 수 없습니다.")
     return user
 
