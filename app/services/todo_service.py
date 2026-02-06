@@ -64,6 +64,6 @@ class TodoService:
 
     def delete_todo(self, db: Session, user: User, todo_id: uuid.UUID):
         todo = self.get_todo(db, user, todo_id)
-        return todo_repo.delete(db, todo)
+        todo_repo.delete(db, todo)
 
 todo_service = TodoService()

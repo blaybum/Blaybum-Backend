@@ -82,11 +82,11 @@ async def reorder_todos(
     result = todo_service.reorder_todo(db, user, todo_id, request.order_index)
     return {"success": True, "data": result}
 
-@router.delete("/{todo_id}", status_code=status.HTTP_200_OK)
+@router.delete("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo(
     todo_id: uuid.UUID,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
-    result = todo_service.delete_todo(db, user, todo_id)
-    return {"success": True, "data": result}
+    todo_service.delete_todo(db, user, todo_id)
+    return

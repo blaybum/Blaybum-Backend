@@ -52,6 +52,6 @@ class PlannerService:
 
     def delete_planner(self, db: Session, user: User, planner_id: uuid.UUID):
         planner = self.get_planner(db, user, planner_id)
-        return planner_repo.delete(db, planner)
+        planner_repo.delete(db, planner)
 
 planner_service = PlannerService()
