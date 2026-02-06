@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from app.repositories.planner_repository import planner_repo
 from app.schemas import PlannerCreateRequest, PlannerUpdateRequest
-from app.models.models import DayOfWeek, User
+from typing import List, Tuple
+from app.models.models import DayOfWeek, User, Planner
 from fastapi import HTTPException, status
 import uuid
 from datetime import date
@@ -39,7 +40,7 @@ class PlannerService:
             )
         return planner
 
-    def get_planners(self, db: Session, user: User, start_date: date, end_date: date, page: int, limit: int):
+    def get_planners(self, db: Session, user: User, start_date: date, end_date: date, page: int, limit: int) -> Tuple[List[Planner], int]:
         skip = (page - 1) * limit
         return planner_repo.get_paginated_by_user(db, user.id, start_date, end_date, skip, limit)
 

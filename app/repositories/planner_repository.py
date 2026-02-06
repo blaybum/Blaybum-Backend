@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Tuple
 from sqlalchemy.orm import Session
 from app.models.models import Planner
 from app.repositories.base_repository import BaseRepository
@@ -21,8 +21,8 @@ class PlannerRepository(BaseRepository[Planner]):
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
         skip: int = 0,
-        limit: int = 10
-    ) -> (List[Planner], int):
+        limit: int = 20
+    ) -> Tuple[List[Planner], int]:
         query = db.query(Planner).filter(Planner.user_id == user_id)
 
         if start_date:
