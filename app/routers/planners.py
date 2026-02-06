@@ -12,8 +12,8 @@ from app.schemas import (
     PlannerUpdateRequest,
     PaginatedResponseModel
 )
-from app.models.models import User
-from app.services.planner_service import planner_service
+from app.models import User
+from app.services import planner_service
 
 router = APIRouter()
 

@@ -3,10 +3,9 @@ from typing import List, Tuple
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app.models.models import User, Pomo, Concentration
-from app.repositories.pomo_repository import pomo_repo
-from app.repositories.concentration_repository import concentration_repo
-from app.schemas.pomo_schemas import PomoCreateRequest, PomoUpdateRequest, ConcentrationCreate
+from app.models import User, Pomo, Concentration
+from app.repositories import pomo_repo, concentration_repo
+from app.schemas import PomoCreateRequest, PomoUpdateRequest, ConcentrationCreate
 
 class PomoService:
     def create_pomo(self, db: Session, user: User, request: PomoCreateRequest) -> Pomo:

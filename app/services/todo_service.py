@@ -1,9 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from app.repositories.todo_repository import todo_repo
-from app.repositories.planner_repository import planner_repo
+from app.repositories import todo_repo, planner_repo
 from app.schemas import TodoCreateRequest, TodoUpdateRequest
-from app.models.models import User
+from app.models import User
 from fastapi import HTTPException, status
 import uuid
 

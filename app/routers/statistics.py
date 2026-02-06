@@ -3,13 +3,13 @@ from sqlalchemy.orm import Session
 from datetime import date
 
 from app.database import get_db
-from app.models.models import User
+from app.models import User
 from app.schemas import (
     ResponseModel,
     DailyStatisticsResponse,
     WeeklyStatisticsResponse
 )
-from app.services.statistics_service import statistics_service
+from app.services import statistics_service
 
 router = APIRouter()
 

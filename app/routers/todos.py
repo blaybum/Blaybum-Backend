@@ -10,8 +10,8 @@ from app.schemas import (
     TodoResponse, 
     TodoUpdateRequest
 )
-from app.models.models import User
-from app.services.todo_service import todo_service
+from app.models import User
+from app.services import todo_service
 
 router = APIRouter()
 

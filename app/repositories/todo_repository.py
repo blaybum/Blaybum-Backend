@@ -1,7 +1,7 @@
 from typing import Optional, List
 from sqlalchemy.orm import Session
 from sqlalchemy import case, func
-from app.models.models import Todo, Planner
+from app.models import Todo, Planner
 from app.repositories.base_repository import BaseRepository
 import uuid
 

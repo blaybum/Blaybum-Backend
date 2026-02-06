@@ -1,19 +1,18 @@
 import uuid
-from typing import List, Optional
 from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.models import User
+from app.models import User
 from app.schemas import ResponseModel, PaginatedResponseModel
-from app.schemas.pomo_schemas import (
+from app.schemas import (
     PomoCreateRequest, 
     PomoResponse, 
     PomoUpdateRequest,
     ConcentrationCreate,
     ConcentrationResponse
 )
-from app.services.pomo_service import pomo_service
+from app.services import pomo_service
 
 router = APIRouter()
 

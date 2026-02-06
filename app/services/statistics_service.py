@@ -1,8 +1,7 @@
 from sqlalchemy.orm import Session
 from datetime import date, timedelta
-from app.repositories.todo_repository import todo_repo
-from app.repositories.planner_repository import planner_repo
-from app.models.models import User, Todo, Planner
+from app.repositories import todo_repo, planner_repo
+from app.models import User, Todo, Planner
 
 class StatisticsService:
     def get_planner_daily_statistics(self, db: Session, user: User, target_date: date):

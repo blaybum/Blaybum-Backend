@@ -10,7 +10,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from app.database import Base, engine, get_db
-from app.models.models import Post, User
 from app.settings import Colors, settings
 from app.config import config
 from app.routers.api_v1 import api_v1_router

@@ -1,6 +1,6 @@
 from typing import Optional, List, Tuple
 from sqlalchemy.orm import Session
-from app.models.models import Planner
+from app.models import Planner
 from app.repositories.base_repository import BaseRepository
 from datetime import date
 

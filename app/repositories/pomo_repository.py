@@ -1,7 +1,7 @@
 from typing import List, Tuple
 from sqlalchemy.orm import Session
 from app.repositories.base_repository import BaseRepository
-from app.models.models import Pomo
+from app.models import Pomo
 
 class PomoRepository(BaseRepository[Pomo]):
     def __init__(self):
