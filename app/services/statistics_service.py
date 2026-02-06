@@ -5,7 +5,7 @@ from app.repositories.planner_repository import planner_repo
 from app.models.models import User, Todo, Planner
 
 class StatisticsService:
-    def get_daily_statistics(self, db: Session, user: User, target_date: date):
+    def get_planner_daily_statistics(self, db: Session, user: User, target_date: date):
         planner = planner_repo.get_by_user_and_date(db, user.id, target_date)
         if not planner:
              return {
@@ -46,7 +46,7 @@ class StatisticsService:
 
         return stats
 
-    def get_weekly_statistics(self, db: Session, user: User, start_date: date):
+    def get_planner_weekly_statistics(self, db: Session, user: User, start_date: date):
         end_date = start_date + timedelta(days=6)
 
 
