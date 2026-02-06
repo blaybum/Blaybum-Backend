@@ -3,12 +3,12 @@ from pydantic import BaseModel
 
 T = TypeVar("T")
 
-#공통 응답 모델
+#Global Response
 class ResponseModel(BaseModel, Generic[T]):
     success: bool
     data: Optional[T] = None
    
-# 페이징 모델
+# Pagination
 class PaginationInfo(BaseModel):
     current_page: int
     total_pages: int
