@@ -57,6 +57,39 @@ class TodoService:
 
         return todo_repo.update(db, todo, update_data)
 
+    def reorder_todos(self, db: Session, user: User, todo_id: uuid.UUID, request: any):
+        planner = planner_repo.get_by_id(db, request.planner_id)
+        if not planner or planner.user_id != user.id:
+            raise HTTPException(status_code=404, detail="플래너를 찾을 수 없거나 접근 권한이 없습니다.")
+
+        try:
+            from app.models import Todo
+            todo_ids = [order.todo_id for order in request.orders]
+            order_map = {order.todo_id: order.order_index for order in request.orders}
+            
+            todos = db.query(Todo).filter(
+                Todo.todo_id.in_(todo_ids),
+                Todo.planner_id == request.planner_id
+            ).all()
+
+            target_todo = None
+            for todo in todos:
+                todo.order_index = order_map[todo.todo_id]
+                db.add(todo)
+                if todo.todo_id == todo_id:
+                    target_todo = todo
+            
+            db.commit()
+            if target_todo:
+                db.refresh(target_todo)
+            return target_todo
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"배치 순서 변경 중 오류가 발생했습니다: {str(e)}"
+            )
+
     def reorder_todo(self, db: Session, user: User, todo_id: uuid.UUID, new_order: int):
         todo = self.get_todo(db, user, todo_id)
         return todo_repo.update(db, todo, {"order_index": new_order})

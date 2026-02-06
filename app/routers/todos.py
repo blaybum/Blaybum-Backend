@@ -8,7 +8,8 @@ from app.schemas import (
     ResponseModel,
     TodoCreateRequest, 
     TodoResponse, 
-    TodoUpdateRequest
+    TodoUpdateRequest,
+    TodoReorderRequest
 )
 from app.models import User
 from app.services import todo_service
@@ -75,11 +76,11 @@ async def patch_todo(
 @router.patch("/{todo_id}/reorder", response_model=ResponseModel[TodoResponse], status_code=status.HTTP_200_OK)
 async def reorder_todos(
     todo_id: uuid.UUID,
-    request: TodoUpdateRequest,
+    request: TodoReorderRequest,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
-    result = todo_service.reorder_todo(db, user, todo_id, request.order_index)
+    result = todo_service.reorder_todos(db, user, todo_id, request)
     return {"success": True, "data": result}
 
 @router.delete("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)

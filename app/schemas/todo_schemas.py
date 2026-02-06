@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime, time
 from enum import Enum
 from pydantic import BaseModel, ConfigDict, Field
@@ -9,6 +9,11 @@ class PriorityEnum(str, Enum):
     low = "low"
     medium = "medium"
     high = "high"
+
+#Sub
+class TodoOrder(BaseModel):
+    todo_id: uuid.UUID
+    order_index: int
 
 #Request
 class TodoCreateRequest(BaseModel):
@@ -27,6 +32,12 @@ class TodoUpdateRequest(BaseModel):
     actual_duration_minutes: Optional[int] = None
     priority: Optional[PriorityEnum] = None
     status: Optional[str] = None
+
+# Reorder Request
+
+class TodoReorderRequest(BaseModel):
+    planner_id: uuid.UUID
+    orders: List[TodoOrder]
 
 #Response
 class TodoResponse(BaseModel):

@@ -19,7 +19,9 @@ from .todo_schemas import (
     PriorityEnum,
     TodoCreateRequest,
     TodoResponse,
-    TodoUpdateRequest
+    TodoUpdateRequest,
+    TodoOrder,
+    TodoReorderRequest
 )
 from .pomo_schemas import (
     UsageEventTypeEnum,
@@ -44,6 +46,8 @@ __all__ = [
     "TodoCreateRequest",
     "TodoResponse",
     "TodoUpdateRequest",
+    "TodoOrder",
+    "TodoReorderRequest",
     "PriorityEnum",
     "PaginationInfo",
     "PaginatedResponseModel",
