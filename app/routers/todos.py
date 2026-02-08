@@ -7,21 +7,15 @@ from app.database import get_db
 from app.schemas.schemas import TodoCreateRequest, ResponseModel, TodoResponse, TodoUpdateRequest
 from app.models.models import User
 from app.services.todo_service import todo_service
+from app.auth.users import current_active_user
 
 router = APIRouter()
-
-def get_current_user(db: Session = Depends(get_db)) -> User:
-    user = db.query(User).first()
-    if not user:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=404, detail="유저를 찾을 수 없습니다.")
-    return user
 
 @router.post("/", response_model=ResponseModel[TodoResponse], status_code=status.HTTP_201_CREATED)
 async def create_todo(
     request: TodoCreateRequest,
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    user: User = Depends(current_active_user)
 ):
     result = todo_service.create_todo(db, user, request)
     return {"success": True, "data": result}
@@ -33,7 +27,7 @@ async def get_todos(
     priority: Optional[str] = None,
     sort_by: str = "order_index",
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    user: User = Depends(current_active_user)
 ):
     result = todo_service.get_todos(db, user, planner_id, status, priority, sort_by)
     return {"success": True, "data": result}
@@ -42,7 +36,7 @@ async def get_todos(
 async def get_todo(
     todo_id: uuid.UUID,
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    user: User = Depends(current_active_user)
 ):
     result = todo_service.get_todo(db, user, todo_id)
     return {"success": True, "data": result}
@@ -52,7 +46,7 @@ async def update_todo(
     todo_id: uuid.UUID,
     request: TodoUpdateRequest,
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    user: User = Depends(current_active_user)
 ):
     result = todo_service.update_todo(db, user, todo_id, request)
     return {"success": True, "data": result}
@@ -62,7 +56,7 @@ async def patch_todo(
     todo_id: uuid.UUID,
     request: TodoUpdateRequest,
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    user: User = Depends(current_active_user)
 ):
     result = todo_service.patch_todo(db, user, todo_id, request)
     return {"success": True, "data": result}
@@ -72,7 +66,7 @@ async def reorder_todos(
     todo_id: uuid.UUID,
     request: TodoUpdateRequest,
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    user: User = Depends(current_active_user)
 ):
     result = todo_service.reorder_todo(db, user, todo_id, request.order_index)
     return {"success": True, "data": result}
@@ -81,7 +75,7 @@ async def reorder_todos(
 async def delete_todo(
     todo_id: uuid.UUID,
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    user: User = Depends(current_active_user)
 ):
     result = todo_service.delete_todo(db, user, todo_id)
     return {"success": True, "data": result}

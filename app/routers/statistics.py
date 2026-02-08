@@ -11,21 +11,15 @@ from app.schemas.schemas import (
     WeeklyStatisticsResponse
 )
 from app.services.statistics_service import statistics_service
+from app.auth.users import current_active_user
 
 router = APIRouter()
-
-def get_current_user(db: Session = Depends(get_db)) -> User:
-    user = db.query(User).first()
-    if not user:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=404, detail="유저를 찾을 수 없습니다.")
-    return user
 
 @router.get("/daily", response_model=ResponseModel[DailyStatisticsResponse])
 async def get_daily_statistics(
     target_date: date = Query(..., alias="date"),
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    user: User = Depends(current_active_user)
 ):
     result = statistics_service.get_daily_statistics(db, user, target_date)
     return {"success": True, "data": result}
@@ -34,7 +28,7 @@ async def get_daily_statistics(
 async def get_weekly_statistics(
     start_date: date = Query(..., description="주간 시작 날짜 (YYYY-MM-DD)"),
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    user: User = Depends(current_active_user)
 ):
     result = statistics_service.get_weekly_statistics(db, user, start_date)
     return {"success": True, "data": result}

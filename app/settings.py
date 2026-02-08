@@ -28,12 +28,29 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = Field(
         default=30, alias="ACCESS_TOKEN_EXPIRE_MINUTES"
     )
+    refresh_token_expire_days: int = Field(
+        default=7, alias="REFRESH_TOKEN_EXPIRE_DAYS"
+    )
 
     redis_host: str = Field(default="localhost", alias="REDIS_HOST")
     redis_port: int = Field(default=6379, alias="REDIS_PORT")
     redis_password: str = Field(default="", alias="REDIS_PASSWORD")
 
-    cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    google_client_id: str = Field(default="", alias="GOOGLE_CLIENT_ID")
+    google_client_secret: str = Field(default="", alias="GOOGLE_CLIENT_SECRET")
+
+    kakao_client_id: str = Field(default="", alias="KAKAO_CLIENT_ID")
+    kakao_client_secret: str = Field(default="", alias="KAKAO_CLIENT_SECRET")
+
+    oauth_redirect_url: str = Field(default="http://localhost:3000/auth/callback", alias="OAUTH_REDIRECT_URL")
+
+    cors_origins: list[str] = [
+        "http://localhost:3000", 
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "null"  # file:// 프로토콜용
+    ]
 
 
 class Colors:

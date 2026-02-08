@@ -1,0 +1,45 @@
+INFO:     Will watch for changes in these directories: ['/Users/kimminje/Desktop/blaybum-backend']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [71715] using WatchFiles
+INFO:     Started server process [71717]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+[94m 연결중인 데이터베이스: postgresql://blaybum_user:blaybum_password@localhost:5432/blaybum_db[0m
+[92m 데이터베이스 엔진 생성 성공[0m
+[94m Redis 서버에 연결 시도: localhost:6379[0m
+[92m Redis 연결 성공[0m
+[92m데이터베이스 연결 성공[0m
+INFO:     127.0.0.1:59929 - "GET /test_auth.html HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59931 - "GET /scripts/test_auth.html HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59934 - "GET /static/test_auth.html HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:59935 - "OPTIONS /auth/register HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59935 - "POST /auth/register HTTP/1.1" 400 Bad Request
+사용자 등록 완료: test@exsample.com
+INFO:     127.0.0.1:59937 - "POST /auth/register HTTP/1.1" 201 Created
+2026-02-06 20:32:30 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2026-02-06 20:32:30 - python_multipart.multipart - DEBUG - Calling on_field_name with data[0:8]
+2026-02-06 20:32:30 - python_multipart.multipart - DEBUG - Calling on_field_data with data[9:28]
+2026-02-06 20:32:30 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2026-02-06 20:32:30 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2026-02-06 20:32:30 - python_multipart.multipart - DEBUG - Calling on_field_name with data[29:37]
+2026-02-06 20:32:30 - python_multipart.multipart - DEBUG - Calling on_field_data with data[38:50]
+2026-02-06 20:32:30 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2026-02-06 20:32:30 - python_multipart.multipart - DEBUG - Calling on_end with no data
+사용자 로그인: test@exsample.com
+INFO:     127.0.0.1:59939 - "POST /auth/jwt/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59950 - "GET /auth/google/authorize HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60050 - "GET /static/test_auth.html HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:60052 - "GET /static/test_auth.html HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:60062 - "GET /auth/google/authorize HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60066 - "GET /auth/callback/google?state=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJmYXN0YXBpLXVzZXJzOm9hdXRoLXN0YXRlIiwiZXhwIjoxNzcwMzgyMDQ1fQ.JZvQCymhP5ifbG0ZqW9pJONzZf2VGysUyMX5SWOPQuc&code=4%2F0ASc3gC1xVbngh2TQOTmTfYFh2mr6CZV3kb3qMhdPhmLtWiRnxNKNg9iBrfScbmEKF6ORtw&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=0&prompt=consent HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [71717]
+INFO:     Stopping reloader process [71715]
+INFO:     Will watch for changes in these directories: ['/Users/kimminje/Desktop/blaybum-backend']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [42170] using WatchFiles
+INFO:     Started server process [42172]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.

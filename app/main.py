@@ -7,6 +7,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from app.database import Base, engine, get_db
@@ -44,6 +45,16 @@ app.add_middleware(
 )
 
 app.include_router(api_v1_router)
+
+from pathlib import Path
+static_dir = Path(__file__).parent.parent
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    from app.auth.redis import close_async_redis
+    await close_async_redis()
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
