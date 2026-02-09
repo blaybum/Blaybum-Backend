@@ -1,7 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import date
-from typing import List, Optional
-import uuid
+from typing import List
 
 class DailyStudyRecordResponse(BaseModel):
     record_date: date

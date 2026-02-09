@@ -1,6 +1,6 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-from datetime import date, datetime
+from datetime import date
 import logging
 
 from app.database import SessionLocal

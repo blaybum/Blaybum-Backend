@@ -1,11 +1,11 @@
 import uuid
-from datetime import date, datetime
+from datetime import date
 from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
-from app.models.models import User, Pomo, Todo, Planner, DailyStudyRecord
-from app.repositories import grow_repo, pomo_repo, todo_repo, planner_repo
+from app.models.models import User, Pomo, DailyStudyRecord
+from app.repositories import grow_repo, todo_repo, planner_repo
 
 class GrowService:
     def calculate_daily_achievement(self, db: Session, user_id: uuid.UUID, target_date: date) -> DailyStudyRecord:
