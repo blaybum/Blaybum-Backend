@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
-from app.repositories.planner_repository import planner_repo
-from app.schemas.schemas import PlannerCreateRequest, PlannerUpdateRequest
-from app.models.models import DayOfWeek, User
+from app.repositories import planner_repo
+from app.schemas import PlannerCreateRequest, PlannerUpdateRequest
+from typing import List, Tuple
+from app.models import DayOfWeek, User, Planner
 from fastapi import HTTPException, status
 import uuid
 from datetime import date
@@ -39,19 +40,19 @@ class PlannerService:
             )
         return planner
 
-    def get_planners(self, db: Session, user: User, start_date: date, end_date: date, page: int, limit: int):
+    def get_planners(self, db: Session, user: User, start_date: date, end_date: date, page: int, limit: int) -> Tuple[List[Planner], int]:
         skip = (page - 1) * limit
         return planner_repo.get_paginated_by_user(db, user.id, start_date, end_date, skip, limit)
 
     def update_planner(self, db: Session, user: User, planner_id: uuid.UUID, request: PlannerUpdateRequest):
         planner = self.get_planner(db, user, planner_id)
-        update_data = request.dict(exclude_unset=True)
+        update_data = request.model_dump(exclude_unset=True)
         if not update_data:
             raise HTTPException(status_code=400, detail="수정할 데이터가 제공되지 않았습니다.")
         return planner_repo.update(db, planner, update_data)
 
     def delete_planner(self, db: Session, user: User, planner_id: uuid.UUID):
         planner = self.get_planner(db, user, planner_id)
-        return planner_repo.delete(db, planner)
+        planner_repo.delete(db, planner)
 
 planner_service = PlannerService()

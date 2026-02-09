@@ -1,22 +1,30 @@
 import uuid
 from typing import Optional
 from datetime import date
-from fastapi import APIRouter, Depends, status
+import math
+from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.schemas.schemas import (
+from app.schemas import (
     ResponseModel,
     PlannerCreateRequest,
     PlannerResponse,
     PlannerUpdateRequest,
     PaginatedResponseModel
 )
-from app.models.models import User
-from app.services.planner_service import planner_service
+from app.models import User
+from app.services import planner_service
 from app.auth.users import current_active_user
 
 router = APIRouter()
+
+def get_current_user(db: Session = Depends(get_db)) -> User:
+    user = db.query(User).first()
+    if not user:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="유저를 찾을 수 없습니다.")
+    return user
 
 @router.post("/", response_model=ResponseModel[PlannerResponse], status_code=status.HTTP_201_CREATED)
 async def create_planner(
@@ -45,10 +53,8 @@ async def get_planners(
     db: Session = Depends(get_db),
     user: User = Depends(current_active_user)
 ):
-    from datetime import date
     planners, total_items = planner_service.get_planners(db, user, start_date, end_date, page, limit)
 
-    import math
     total_pages = math.ceil(total_items / limit) if total_items > 0 else 0
 
     return {

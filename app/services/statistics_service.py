@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
 from datetime import date, timedelta
-from app.repositories.todo_repository import todo_repo
-from app.repositories.planner_repository import planner_repo
-from app.models.models import User, Todo, Planner
+from app.repositories import todo_repo, planner_repo
+from app.models import User, Todo, Planner, Pomo
+from sqlalchemy import func, cast, Date
 
 class StatisticsService:
-    def get_daily_statistics(self, db: Session, user: User, target_date: date):
+    def get_planner_daily_statistics(self, db: Session, user: User, target_date: date):
         planner = planner_repo.get_by_user_and_date(db, user.id, target_date)
         if not planner:
              return {
@@ -46,7 +46,7 @@ class StatisticsService:
 
         return stats
 
-    def get_weekly_statistics(self, db: Session, user: User, start_date: date):
+    def get_planner_weekly_statistics(self, db: Session, user: User, start_date: date):
         end_date = start_date + timedelta(days=6)
 
 
@@ -68,11 +68,6 @@ class StatisticsService:
                 if todo.status == "completed":
                     breakdown_dict[plan_date]["completed"] += 1
 
-        daily_breakdown = [
-            {"date": d, "total": s["total"], "completed": s["completed"]}
-            for d, s in sorted(breakdown_dict.items())
-        ]
-
         return {
             "week_start": start_date,
             "week_end": end_date,
@@ -80,6 +75,71 @@ class StatisticsService:
             "completed_todos": completed_todos,
             "completion_rate": completion_rate,
             "daily_breakdown": daily_breakdown
+        }
+
+    def get_pomo_daily_statistics(self, db: Session, user: User, target_date: date):
+        pomo_results = db.query(
+            func.count(Pomo.id).label("count"),
+            func.sum(
+                func.extract('epoch', Pomo.real_end_time - Pomo.real_start_time)
+            ).label("total_seconds")
+        ).filter(
+            Pomo.user_id == user.id,
+            cast(Pomo.real_start_time, Date) == target_date
+        ).first()
+
+        pomo_count = pomo_results.count or 0
+        total_minutes = int((pomo_results.total_seconds or 0) / 60)
+
+        completed_todos = db.query(func.count(Todo.todo_id)).join(Planner).filter(
+            Planner.user_id == user.id,
+            Todo.status == "completed",
+            cast(Todo.completed_at, Date) == target_date
+        ).scalar() or 0
+
+        return {
+            "date": target_date,
+            "total_study_time_minutes": total_minutes,
+            "pomo_count": pomo_count,
+            "completed_todos": completed_todos
+        }
+
+    def get_pomo_me_statistics(self, db: Session, user: User):
+        results = db.query(
+            func.count(Pomo.id).label("total_count"),
+            func.sum(
+                func.extract('epoch', Pomo.real_end_time - Pomo.real_start_time)
+            ).label("total_seconds"),
+            func.count(func.distinct(cast(Pomo.real_start_time, Date))).label("days_count")
+        ).filter(
+            Pomo.user_id == user.id
+        ).first()
+
+        total_pomo_count = results.total_count or 0
+        total_minutes = int((results.total_seconds or 0) / 60)
+        days_count = results.days_count or 1
+        average_minutes = int(total_minutes / days_count) if days_count > 0 else 0
+
+        best_day_result = db.query(
+            cast(Pomo.real_start_time, Date).label("study_date"),
+            func.sum(
+                func.extract('epoch', Pomo.real_end_time - Pomo.real_start_time)
+            ).label("daily_seconds")
+        ).filter(
+            Pomo.user_id == user.id
+        ).group_by(
+            "study_date"
+        ).order_by(
+            func.sum(func.extract('epoch', Pomo.real_end_time - Pomo.real_start_time)).desc()
+        ).first()
+
+        best_day = best_day_result.study_date if best_day_result else None
+
+        return {
+            "total_study_time_minutes": total_minutes,
+            "average_daily_minutes": average_minutes,
+            "total_pomo_count": total_pomo_count,
+            "best_day": best_day
         }
 
 statistics_service = StatisticsService()
