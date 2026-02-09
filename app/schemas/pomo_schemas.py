@@ -46,6 +46,7 @@ class PomoResponse(BaseModel):
     real_start_time: datetime
     real_end_time: datetime
     category: PomoCategory
+    distraction_count: int = 0
     edit_start_time: datetime
     edit_end_time: datetime
     created_at: datetime
@@ -60,6 +61,7 @@ class PomoCreateResponse(BaseModel):
     real_start_time: datetime
     real_end_time: datetime
     category: PomoCategory
+    distraction_count: int = 0
     created_at: datetime
     updated_at: datetime
 
@@ -68,6 +70,7 @@ class PomoCreateResponse(BaseModel):
 class PomoUpdateResponse(BaseModel):
     id: uuid.UUID
     category: PomoCategory
+    distraction_count: int = 0
     edit_start_time: datetime
     edit_end_time: datetime
     updated_at: datetime

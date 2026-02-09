@@ -154,6 +154,12 @@ class Pomo(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
+    @property
+    def distraction_count(self) -> int:
+        if not hasattr(self, "concentration_logs"):
+            return 0
+        return len([log for log in self.concentration_logs if log.event_type == "PICK_UP"])
+
     __table_args__ = (
         Index('idx_pomo_user', 'user_id'),
         Index('idx_pomo_todo', 'todo_id'),

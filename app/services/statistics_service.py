@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from datetime import date, timedelta
 from app.repositories import todo_repo, planner_repo
-from app.models import User, Todo, Planner, Pomo
+from app.models import User, Todo, Planner, Pomo, Concentration
 from sqlalchemy import func, cast, Date
 
 class StatisticsService:
@@ -97,11 +97,18 @@ class StatisticsService:
             cast(Todo.completed_at, Date) == target_date
         ).scalar() or 0
 
+        total_distractions = db.query(func.count(Concentration.id)).join(Pomo).filter(
+            Pomo.user_id == user.id,
+            cast(Pomo.real_start_time, Date) == target_date,
+            Concentration.event_type == "PICK_UP"
+        ).scalar() or 0
+
         return {
             "date": target_date,
             "total_study_time_minutes": total_minutes,
             "pomo_count": pomo_count,
-            "completed_todos": completed_todos
+            "completed_todos": completed_todos,
+            "total_distraction_count": total_distractions
         }
 
     def get_pomo_me_statistics(self, db: Session, user: User):
@@ -135,10 +142,16 @@ class StatisticsService:
 
         best_day = best_day_result.study_date if best_day_result else None
 
+        total_distractions = db.query(func.count(Concentration.id)).join(Pomo).filter(
+            Pomo.user_id == user.id,
+            Concentration.event_type == "PICK_UP"
+        ).scalar() or 0
+
         return {
             "total_study_time_minutes": total_minutes,
             "average_daily_minutes": average_minutes,
             "total_pomo_count": total_pomo_count,
+            "total_distraction_count": total_distractions,
             "best_day": best_day
         }
 
