@@ -3,6 +3,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 from pydantic import BaseModel, ConfigDict
+from app.models import PomoCategory
 
 # Enum
 class UsageEventTypeEnum(str, Enum):
@@ -29,9 +30,11 @@ class PomoCreateRequest(BaseModel):
     todo_id: Optional[uuid.UUID] = None
     real_start_time: Optional[datetime] = None
     real_end_time: Optional[datetime] = None
+    category: PomoCategory = PomoCategory.ETC
 
 class PomoUpdateRequest(BaseModel):
     todo_id: Optional[uuid.UUID] = None
+    category: Optional[PomoCategory] = None
     edit_start_time: Optional[datetime] = None
     edit_end_time: Optional[datetime] = None
 
@@ -42,6 +45,8 @@ class PomoResponse(BaseModel):
     todo_id: Optional[uuid.UUID] = None
     real_start_time: datetime
     real_end_time: datetime
+    category: PomoCategory
+    distraction_count: int = 0
     edit_start_time: datetime
     edit_end_time: datetime
     created_at: datetime
@@ -55,6 +60,8 @@ class PomoCreateResponse(BaseModel):
     todo_id: Optional[uuid.UUID] = None
     real_start_time: datetime
     real_end_time: datetime
+    category: PomoCategory
+    distraction_count: int = 0
     created_at: datetime
     updated_at: datetime
 
@@ -62,6 +69,8 @@ class PomoCreateResponse(BaseModel):
 
 class PomoUpdateResponse(BaseModel):
     id: uuid.UUID
+    category: PomoCategory
+    distraction_count: int = 0
     edit_start_time: datetime
     edit_end_time: datetime
     updated_at: datetime

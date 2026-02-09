@@ -3,7 +3,7 @@ from typing import List, Tuple
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app.models import User, Pomo, Concentration
+from app.models import User, Pomo, Concentration, PomoCategory
 from app.repositories import pomo_repo, concentration_repo
 from app.schemas import PomoCreateRequest, PomoUpdateRequest, ConcentrationCreate
 
@@ -16,7 +16,8 @@ class PomoService:
             "real_start_time": request.real_start_time or None,
             "real_end_time": request.real_end_time or None,
             "edit_start_time": request.real_start_time or None,
-            "edit_end_time": request.real_end_time or None,
+            "edit_end_time": request.real_start_time or None,
+            "category": request.category or PomoCategory.ETC
         }
         return pomo_repo.create(db, pomo_data)
 
@@ -37,7 +38,7 @@ class PomoService:
 
     def update_pomo(self, db: Session, user: User, pomo_id: uuid.UUID, request: PomoUpdateRequest) -> Pomo:
         pomo = self.get_pomo(db, user, pomo_id)
-        update_data = request.model_dump(exclude_unset=True)
+        update_data = request.model_dump(exclude_unset=True, exclude_none=True)
         return pomo_repo.update(db, pomo, update_data)
 
     def delete_pomo(self, db: Session, user: User, pomo_id: uuid.UUID) -> None:

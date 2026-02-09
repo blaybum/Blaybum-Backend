@@ -38,9 +38,11 @@ class PomoDailyStatisticsResponse(BaseModel):
     total_study_time_minutes: int
     pomo_count: int
     completed_todos: int
+    total_distraction_count: int = 0
 
 class PomoMeStatisticsResponse(BaseModel):
     total_study_time_minutes: int
     average_daily_minutes: int
     total_pomo_count: int
+    total_distraction_count: int = 0
     best_day: Optional[date] = None

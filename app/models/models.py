@@ -36,7 +36,6 @@ class TodoStatus(str, enum.Enum):
     completed = "completed"
     cancelled = "cancelled"
 
-
 class UserRole(str, enum.Enum):
     mentor = "mentor"
     mentee = "mentee"
@@ -49,6 +48,13 @@ class OAuthAccount(SQLAlchemyBaseOAuthAccountTableUUID, Base):
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
 
+class PomoCategory(str, enum.Enum):
+    MATH = "수학"
+    ENGLISH = "영어"
+    KOREAN = "국어"
+    SCIENCE = "과학"
+    SOCIETY = "사회"
+    ETC = "기타"
 
 class User(SQLAlchemyBaseUserTableUUID, Base):
     __tablename__ = "users"
@@ -138,6 +144,7 @@ class Pomo(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     planner_id = Column(UUID(as_uuid=True), ForeignKey("planners.planner_id", ondelete="SET NULL"), nullable=True)
     todo_id = Column(UUID(as_uuid=True), ForeignKey("todos.todo_id", ondelete="SET NULL"), nullable=True)
+    category = Column(Enum(PomoCategory), nullable=False, server_default=PomoCategory.ETC.value)
     real_start_time = Column(DateTime(timezone=True), server_default=func.now())
     real_end_time = Column(DateTime(timezone=True), server_default=func.now())
     edit_start_time = Column(DateTime(timezone=True), server_default=func.now())
@@ -146,6 +153,12 @@ class Pomo(Base):
     updated_at = Column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
+
+    @property
+    def distraction_count(self) -> int:
+        if not hasattr(self, "concentration_logs"):
+            return 0
+        return len([log for log in self.concentration_logs if log.event_type == "PICK_UP"])
 
     __table_args__ = (
         Index('idx_pomo_user', 'user_id'),
