@@ -4,7 +4,13 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.schemas.schemas import TodoCreateRequest, ResponseModel, TodoResponse, TodoUpdateRequest
+from app.schemas import (
+    ResponseModel,
+    TodoCreateRequest,
+    TodoResponse,
+    TodoUpdateRequest,
+    TodoReorderRequest
+)
 from app.models.models import User
 from app.services.todo_service import todo_service
 from app.auth.users import current_active_user
