@@ -67,3 +67,5 @@ scripts/logs/
 scripts/.env*
 scripts/config.*
 scripts/secrets.*
+
+.claude/
