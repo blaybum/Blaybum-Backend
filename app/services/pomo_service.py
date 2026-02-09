@@ -17,6 +17,7 @@ class PomoService:
             "real_end_time": request.real_end_time or None,
             "edit_start_time": request.real_start_time or None,
             "edit_end_time": request.real_end_time or None,
+            "category": request.category
         }
         return pomo_repo.create(db, pomo_data)
 
