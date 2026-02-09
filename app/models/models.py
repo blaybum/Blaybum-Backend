@@ -178,3 +178,20 @@ class Concentration(Base):
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
 
     pomo = relationship("Pomo", backref="concentration_logs")
+class DailyStudyRecord(Base):
+    __tablename__ = "daily_study_records"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    record_date = Column(Date, nullable=False)
+    day_number = Column(Integer, nullable=False)
+    is_fulltime_study = Column(Boolean, default=False)
+    is_todolist_complete = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    user = relationship("User", backref="daily_study_records")
+
+    __table_args__ = (
+        UniqueConstraint('user_id', 'record_date', name='unique_user_record_date'),
+    )
