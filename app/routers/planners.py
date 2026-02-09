@@ -15,20 +15,15 @@ from app.schemas import (
 )
 from app.models import User
 from app.services import planner_service
+from app.auth.users import current_active_user
 
 router = APIRouter()
-
-def get_current_user(db: Session = Depends(get_db)) -> User:
-    user = db.query(User).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="유저를 찾을 수 없습니다.")
-    return user
 
 @router.post("/", response_model=ResponseModel[PlannerResponse], status_code=status.HTTP_201_CREATED)
 async def create_planner(
     request: PlannerCreateRequest,
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    user: User = Depends(current_active_user)
 ):
     result = planner_service.create_planner(db, user, request)
     return {"success": True, "data": result}
@@ -37,7 +32,7 @@ async def create_planner(
 async def get_planner(
     planner_id: uuid.UUID,
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    user: User = Depends(current_active_user)
 ):
     result = planner_service.get_planner(db, user, planner_id)
     return {"success": True, "data": result}
@@ -49,7 +44,7 @@ async def get_planners(
     page: int = 1,
     limit: int = 10,
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    user: User = Depends(current_active_user)
 ):
     planners, total_items = planner_service.get_planners(db, user, start_date, end_date, page, limit)
 
@@ -71,7 +66,7 @@ async def update_planner(
     planner_id: uuid.UUID,
     request: PlannerUpdateRequest,
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    user: User = Depends(current_active_user)
 ):
     result = planner_service.update_planner(db, user, planner_id, request)
     return {"success": True, "data": result}
@@ -80,7 +75,7 @@ async def update_planner(
 async def delete_planner(
     planner_id: uuid.UUID,
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user)
+    user: User = Depends(current_active_user)
 ):
     planner_service.delete_planner(db, user, planner_id)
     return

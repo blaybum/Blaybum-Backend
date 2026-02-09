@@ -4,7 +4,7 @@ echo "Starting PostgreSQL with Docker Compose..."
 
 cd "$(dirname "$0")/.."
 
-docker-compose up -d postgres
+docker-compose up -d
 
 echo "Waiting for PostgreSQL to start..."
 sleep 10

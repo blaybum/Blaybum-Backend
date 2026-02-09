@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Auth API Test</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: monospace; background: #1a1a2e; color: #e0e0e0; padding: 20px; }
+  h1 { color: #00d4ff; margin-bottom: 20px; }
+  h2 { color: #ff6b6b; margin: 15px 0 8px; font-size: 14px; }
+  .section { background: #16213e; border: 1px solid #2a2a4a; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+  input, button { font-family: monospace; font-size: 13px; padding: 6px 10px; border-radius: 4px; border: 1px solid #2a2a4a; }
+  input { background: #0f3460; color: #e0e0e0; width: 250px; }
+  button { background: #00d4ff; color: #1a1a2e; cursor: pointer; font-weight: bold; }
+  button:hover { background: #00b4d8; }
+  button.danger { background: #ff6b6b; }
+  button.warn { background: #ffd166; color: #1a1a2e; }
+  pre { background: #0a0a1a; padding: 10px; border-radius: 4px; margin-top: 8px; white-space: pre-wrap; word-break: break-all; font-size: 12px; max-height: 200px; overflow-y: auto; }
+  .token-box { background: #0f3460; padding: 8px; border-radius: 4px; margin: 4px 0; font-size: 11px; word-break: break-all; }
+  .label { color: #ffd166; font-weight: bold; }
+  .ok { color: #06d6a0; }
+  .err { color: #ff6b6b; }
+  .row { display: flex; gap: 8px; align-items: center; margin: 6px 0; flex-wrap: wrap; }
+  #tokens { background: #0f3460; border: 1px solid #2a2a4a; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<h1>Auth API Test</h1>
+
+<div id="tokens">
+  <span class="label">Stored Tokens</span>
+  <div class="token-box">Access: <span id="d-access">없음</span></div>
+  <div class="token-box">Refresh: <span id="d-refresh">없음</span></div>
+  <div class="token-box">Base URL: <span id="d-base">-</span> 
+    <button onclick="setBaseUrl()" style="margin-left: 10px; font-size: 10px;">수정</button>
+  </div>
+</div>
+
+<!-- 회원가입 -->
+<div class="section">
+  <h2>1. POST /auth/register</h2>
+  <div class="row">
+    <input id="reg-email" placeholder="email" value="test@example.com">
+    <input id="reg-pw" placeholder="password" value="TestPass1234" type="password">
+    <button onclick="register()">회원가입</button>
+    <button onclick="useRandomEmail()" style="background: #ffd166; color: #1a1a2e;">랜덤 이메일</button>
+  </div>
+  <pre id="reg-res"></pre>
+</div>
+
+<!-- 로그인 -->
+<div class="section">
+  <h2>2. POST /auth/jwt/login</h2>
+  <div class="row">
+    <input id="login-email" placeholder="email" value="test@example.com">
+    <input id="login-pw" placeholder="password" value="TestPass1234" type="password">
+    <button onclick="login()">로그인</button>
+  </div>
+  <pre id="login-res"></pre>
+</div>
+
+<!-- 내 정보 -->
+<div class="section">
+  <h2>3. GET /auth/users/me (인증 필요)</h2>
+  <div class="row">
+    <button onclick="getMe()">내 정보 조회</button>
+    <button class="warn" onclick="getMeInvalid()">잘못된 토큰으로 시도</button>
+  </div>
+  <pre id="me-res"></pre>
+</div>
+
+<!-- 토큰 갱신 -->
+<div class="section">
+  <h2>4. POST /auth/jwt/refresh (토큰 갱신)</h2>
+  <div class="row">
+    <button onclick="refresh()">토큰 갱신</button>
+    <button class="warn" onclick="refreshOld()">기존 refresh로 재시도</button>
+  </div>
+  <pre id="refresh-res"></pre>
+</div>
+
+<!-- 로그아웃 -->
+<div class="section">
+  <h2>5. POST /auth/jwt/logout</h2>
+  <div class="row">
+    <button class="danger" onclick="logout()">로그아웃</button>
+    <button class="warn" onclick="getMe()">로그아웃 후 /me 시도</button>
+  </div>
+  <pre id="logout-res"></pre>
+</div>
+
+<!-- OAuth -->
+<div class="section">
+  <h2>6. OAuth (Google / Kakao)</h2>
+  <div class="row">
+    <button onclick="oauthAuthorize('google')">Google 로그인</button>
+    <button onclick="oauthAuthorize('kakao')">Kakao 로그인</button>
+  </div>
+  <pre id="oauth-res"></pre>
+</div>
+
+<!-- Redis 확인용 -->
+<div class="section">
+  <h2>7. 전체 플로우 자동 테스트</h2>
+  <div class="row">
+    <button onclick="runAll()">전체 테스트 실행</button>
+  </div>
+  <pre id="all-res"></pre>
+</div>
+
+<script>
+// BASE URL 강제 설정
+const BASE = 'http://127.0.0.1:8000';
+let accessToken = '';
+let refreshToken = '';
+let oldRefreshToken = '';
+
+function updateDisplay() {
+  document.getElementById('d-access').textContent = accessToken ? accessToken.substring(0, 50) + '...' : '없음';
+  document.getElementById('d-refresh').textContent = refreshToken ? refreshToken.substring(0, 50) + '...' : '없음';
+  document.getElementById('d-base').textContent = BASE || location.origin;
+}
+
+function setBaseUrl() {
+  const newBase = prompt('Base URL을 입력하세요:', BASE || location.origin);
+  if (newBase) {
+    // Note: BASE는 const이므로 실제로는 페이지 새로고침이 필요합니다
+    alert(`BASE URL: ${newBase}\n\n현재 파일 위치: ${location.origin}\n파일을 직접 열었다면 자동으로 http://127.0.0.1:8000 사용됩니다.`);
+  }
+}
+
+// 페이지 로드 시 BASE URL 표시
+window.addEventListener('DOMContentLoaded', updateDisplay);
+
+function show(id, data, ok) {
+  const el = document.getElementById(id);
+  const status = ok ? '✓' : '✗';
+  const cls = ok ? 'ok' : 'err';
+  el.innerHTML = `<span class="${cls}">${status}</span> ${JSON.stringify(data, null, 2)}`;
+}
+
+async function register() {
+  try {
+    const email = document.getElementById('reg-email').value;
+    const password = document.getElementById('reg-pw').value;
+    
+    const res = await fetch(`${BASE}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    
+    const data = await res.json();
+    
+    // 사용자 친화적인 메시지 추가
+    let message = data;
+    if (!res.ok && data.data === 'REGISTER_USER_ALREADY_EXISTS') {
+      message = { 
+        ...data, 
+        message: `이미 등록된 이메일입니다: ${email}`,
+        suggestion: '다른 이메일을 사용하거나 로그인을 시도하세요'
+      };
+    } else if (res.ok) {
+      message = { 
+        ...data, 
+        message: `회원가입 성공! 사용자 ID: ${data.id}`,
+        note: '이제 로그인할 수 있습니다'
+      };
+    }
+    
+    show('reg-res', { status: res.status, body: message }, res.ok);
+  } catch (e) { 
+    show('reg-res', { error: e.message, note: 'CORS 또는 네트워크 오류일 수 있습니다' }, false); 
+  }
+}
+
+function generateRandomEmail() {
+  const timestamp = Date.now();
+  const random = Math.floor(Math.random() * 1000);
+  return `test_${timestamp}_${random}@example.com`;
+}
+
+function useRandomEmail() {
+  document.getElementById('reg-email').value = generateRandomEmail();
+}
+
+async function login() {
+  try {
+    const form = new URLSearchParams();
+    form.append('username', document.getElementById('login-email').value);
+    form.append('password', document.getElementById('login-pw').value);
+
+    const res = await fetch(`${BASE}/auth/jwt/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: form,
+    });
+    const data = await res.json();
+
+    if (res.ok && data.access_token) {
+      accessToken = data.access_token;
+      refreshToken = data.refresh_token;
+      updateDisplay();
+    }
+    show('login-res', { status: res.status, body: data }, res.ok);
+  } catch (e) { show('login-res', { error: e.message }, false); }
+}
+
+async function getMe() {
+  try {
+    const res = await fetch(`${BASE}/auth/users/me`, {
+      headers: { 'Authorization': `Bearer ${accessToken}` },
+    });
+    const data = await res.json();
+    show('me-res', { status: res.status, body: data }, res.ok);
+  } catch (e) { show('me-res', { error: e.message }, false); }
+}
+
+async function getMeInvalid() {
+  try {
+    const res = await fetch(`${BASE}/auth/users/me`, {
+      headers: { 'Authorization': 'Bearer invalid_token_here' },
+    });
+    const data = await res.json();
+    show('me-res', { status: res.status, body: data }, res.status === 401);
+  } catch (e) { show('me-res', { error: e.message }, false); }
+}
+
+async function refresh() {
+  try {
+    oldRefreshToken = refreshToken;
+    const res = await fetch(`${BASE}/auth/jwt/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+    const data = await res.json();
+
+    if (res.ok && data.access_token) {
+      accessToken = data.access_token;
+      refreshToken = data.refresh_token;
+      updateDisplay();
+    }
+    show('refresh-res', { status: res.status, body: data }, res.ok);
+  } catch (e) { show('refresh-res', { error: e.message }, false); }
+}
+
+async function refreshOld() {
+  if (!oldRefreshToken) {
+    show('refresh-res', { error: '먼저 토큰 갱신을 실행하세요' }, false);
+    return;
+  }
+  try {
+    const res = await fetch(`${BASE}/auth/jwt/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: oldRefreshToken }),
+    });
+    const data = await res.json();
+    show('refresh-res', { status: res.status, body: data, note: '기존 refresh token → 401이면 정상' }, res.status === 401);
+  } catch (e) { show('refresh-res', { error: e.message }, false); }
+}
+
+async function logout() {
+  try {
+    const res = await fetch(`${BASE}/auth/jwt/logout`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+
+    const ok = res.status === 204;
+    show('logout-res', { status: res.status, note: ok ? '로그아웃 성공 → 토큰 무효화됨' : '실패' }, ok);
+
+    if (ok) {
+      // 토큰은 유지 (무효화 확인 테스트용)
+    }
+  } catch (e) { show('logout-res', { error: e.message }, false); }
+}
+
+async function oauthAuthorize(provider) {
+  try {
+    const url = `${BASE}/auth/${provider}/authorize`;
+    console.log('OAuth 요청 URL:', url);
+    console.log('현재 위치:', location.href);
+    console.log('BASE:', BASE);
+    
+    const res = await fetch(url);
+    const data = await res.json();
+    show('oauth-res', { 
+      status: res.status, 
+      url: url,
+      origin: location.origin,
+      base: BASE,
+      body: data 
+    }, res.ok);
+    
+    if (data.authorization_url) {
+      if (confirm(`${provider} 로그인 페이지로 이동하시겠습니까?`)) {
+        window.open(data.authorization_url, '_blank');
+      }
+    }
+  } catch (e) { 
+    show('oauth-res', { 
+      error: e.message, 
+      url: `${BASE}/auth/${provider}/authorize`,
+      origin: location.origin,
+      base: BASE
+    }, false); 
+  }
+}
+
+async function runAll() {
+  const log = [];
+  const el = document.getElementById('all-res');
+
+  function addLog(step, ok, detail) {
+    const icon = ok ? '✓' : '✗';
+    log.push(`${icon} ${step}: ${JSON.stringify(detail)}`);
+    el.innerHTML = `<span class="${ok ? 'ok' : 'err'}">${log.join('\n')}</span>`;
+  }
+
+  // 1. 로그인
+  const form = new URLSearchParams();
+  form.append('username', document.getElementById('login-email').value);
+  form.append('password', document.getElementById('login-pw').value);
+  let res = await fetch(`${BASE}/auth/jwt/login`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: form });
+  let data = await res.json();
+  accessToken = data.access_token || '';
+  refreshToken = data.refresh_token || '';
+  updateDisplay();
+  addLog('로그인', res.ok, { has_access: !!data.access_token, has_refresh: !!data.refresh_token });
+
+  // 2. /me
+  res = await fetch(`${BASE}/auth/users/me`, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+  data = await res.json();
+  addLog('인증된 /me', res.ok, { email: data.email });
+
+  // 3. refresh
+  const prevAccess = accessToken;
+  res = await fetch(`${BASE}/auth/jwt/refresh`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: refreshToken }) });
+  data = await res.json();
+  const oldRefresh = refreshToken;
+  accessToken = data.access_token || '';
+  refreshToken = data.refresh_token || '';
+  updateDisplay();
+  addLog('토큰 갱신', res.ok, { new_tokens: !!data.access_token });
+
+  // 4. 기존 refresh 재사용 불가
+  res = await fetch(`${BASE}/auth/jwt/refresh`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: oldRefresh }) });
+  addLog('기존 refresh 재사용 차단', res.status === 401, { status: res.status });
+
+  // 5. 기존 access 무효화 확인
+  res = await fetch(`${BASE}/auth/users/me`, { headers: { 'Authorization': `Bearer ${prevAccess}` } });
+  addLog('기존 access 무효화', res.status === 401, { status: res.status });
+
+  // 6. 새 access로 /me
+  res = await fetch(`${BASE}/auth/users/me`, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+  data = await res.json();
+  addLog('새 access로 /me', res.ok, { email: data.email });
+
+  // 7. 로그아웃
+  res = await fetch(`${BASE}/auth/jwt/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: refreshToken }) });
+  addLog('로그아웃', res.status === 204, { status: res.status });
+
+  // 8. 로그아웃 후 access 무효화
+  res = await fetch(`${BASE}/auth/users/me`, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+  addLog('로그아웃 후 access 차단', res.status === 401, { status: res.status });
+
+  // 9. 로그아웃 후 refresh 무효화
+  res = await fetch(`${BASE}/auth/jwt/refresh`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: refreshToken }) });
+  addLog('로그아웃 후 refresh 차단', res.status === 401, { status: res.status });
+}
+</script>
+</body>
+</html>

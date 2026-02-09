@@ -3,13 +3,15 @@ import uuid
 import enum
 from datetime import datetime
 from pathlib import Path
+from typing import List
 
+from fastapi_users.db import SQLAlchemyBaseUserTableUUID, SQLAlchemyBaseOAuthAccountTableUUID
 from sqlalchemy import (
     Boolean, Column, DateTime, ForeignKey, String, Text,
-    Date, Time, Integer, Enum, UniqueConstraint, Index
+    Date, Time, Integer, Enum, UniqueConstraint, Index, JSON
 )
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.sql import func
 
 from app.database import Base
@@ -34,19 +36,34 @@ class TodoStatus(str, enum.Enum):
     completed = "completed"
     cancelled = "cancelled"
 
-class User(Base):
+
+class UserRole(str, enum.Enum):
+    mentor = "mentor"
+    mentee = "mentee"
+    admin = "admin"
+
+class OAuthAccount(SQLAlchemyBaseOAuthAccountTableUUID, Base):
+    __tablename__ = "oauth_accounts"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+
+
+class User(SQLAlchemyBaseUserTableUUID, Base):
     __tablename__ = "users"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    email = Column(String(255), unique=True, index=True, nullable=False)
-    username = Column(String(100), unique=True, index=True, nullable=False)
-    full_name = Column(String(255))
-    hashed_password = Column(String(255), nullable=False)
-    is_active = Column(Boolean, default=True)
-    is_superuser = Column(Boolean, default=False)
+    username = Column(String(100), unique=True, index=True, nullable=True)
+    full_name = Column(String(255), nullable=True)
+    profile_image = Column(String(500), nullable=True)
+    role = Column(Enum(UserRole), default=UserRole.mentee, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    oauth_accounts: Mapped[List[OAuthAccount]] = relationship(
+        "OAuthAccount", lazy="joined", cascade="all, delete-orphan"
     )
 
     posts = relationship("Post", back_populates="author", cascade="all, delete-orphan")
