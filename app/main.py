@@ -49,6 +49,10 @@ from pathlib import Path
 static_dir = Path(__file__).parent.parent
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
+@app.on_event("startup")
+async def startup_event():
+    from app.core.scheduler import start_scheduler
+    start_scheduler()
 
 @app.on_event("shutdown")
 async def shutdown_event():

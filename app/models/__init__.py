@@ -10,7 +10,8 @@ from .models import (
     Priority,
     TodoStatus,
     UsageEventType,
-    PomoCategory
+    PomoCategory,
+    DailyStudyRecord
 )
 
 __all__ = [
@@ -26,4 +27,5 @@ __all__ = [
     "TodoStatus",
     "UsageEventType",
     "PomoCategory",
+    "DailyStudyRecord"
 ]
