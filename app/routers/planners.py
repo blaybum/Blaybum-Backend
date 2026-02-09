@@ -19,13 +19,6 @@ from app.auth.users import current_active_user
 
 router = APIRouter()
 
-def get_current_user(db: Session = Depends(get_db)) -> User:
-    user = db.query(User).first()
-    if not user:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=404, detail="유저를 찾을 수 없습니다.")
-    return user
-
 @router.post("/", response_model=ResponseModel[PlannerResponse], status_code=status.HTTP_201_CREATED)
 async def create_planner(
     request: PlannerCreateRequest,
