@@ -1,9 +1,6 @@
-import sys
 import uuid
-import uuid6
 import enum
 from datetime import datetime
-from pathlib import Path
 from typing import List
 
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID, SQLAlchemyBaseOAuthAccountTableUUID
