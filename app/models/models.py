@@ -137,6 +137,24 @@ class Todo(Base):
         Index('idx_todos_status', 'status'),
     )
 
+class MentorMentee(Base):
+    __tablename__ = "mentor_mentee"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentor_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    mentee_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    mentor = relationship("User", foreign_keys=[mentor_id], backref="mentees_rel")
+    mentee = relationship("User", foreign_keys=[mentee_id], backref="mentor_rel")
+
+    __table_args__ = (
+        UniqueConstraint('mentor_id', 'mentee_id', name='unique_mentor_mentee'),
+        Index('idx_mentor_mentee_mentor', 'mentor_id'),
+        Index('idx_mentor_mentee_mentee', 'mentee_id'),
+    )
+
+
 class Pomo(Base):
     __tablename__ = "pomo"
 

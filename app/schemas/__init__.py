@@ -35,6 +35,10 @@ from .pomo_schemas import (
     ConcentrationResponse,
     PomoUpdateResponse,
 )
+from .mentoring_schemas import (
+    MenteeResponse,
+    MentorMenteeResponse,
+)
 
 
 __all__ = [
@@ -65,5 +69,7 @@ __all__ = [
     "PomoUpdateResponse",
     "ConcentrationCreate",
     "ConcentrationResponse",
+    "MenteeResponse",
+    "MentorMenteeResponse",
 ]
 
