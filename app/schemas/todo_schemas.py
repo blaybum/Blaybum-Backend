@@ -46,5 +46,7 @@ class TodoResponse(BaseModel):
     order_index: int
     created_at: datetime
     updated_at: datetime
+    has_image: bool = False
+    image_url: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
