@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.repositories.base_repository import BaseRepository
 from app.models import Pomo
 
@@ -16,7 +16,9 @@ class PomoRepository(BaseRepository[Pomo]):
     ) -> Tuple[List[Pomo], int]:
         query = db.query(Pomo).filter(Pomo.user_id == user_id)
         total_items = query.count()
-        pomos = query.order_by(Pomo.created_at.desc()).offset(skip).limit(limit).all()
+        pomos = query.options(joinedload(Pomo.concentration_logs))\
+                     .order_by(Pomo.created_at.desc())\
+                     .offset(skip).limit(limit).all()
         return pomos, total_items
 
 pomo_repo = PomoRepository()

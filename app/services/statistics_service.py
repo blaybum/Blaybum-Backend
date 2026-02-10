@@ -68,6 +68,16 @@ class StatisticsService:
                 if todo.status == "completed":
                     breakdown_dict[plan_date]["completed"] += 1
 
+        daily_breakdown = [
+            {
+                "date": d,
+                "total": stats["total"],
+                "completed": stats["completed"],
+                "completion_rate": round((stats["completed"] / stats["total"]) * 100, 2) if stats["total"] > 0 else 0.0
+            }
+            for d, stats in sorted(breakdown_dict.items())
+        ]
+
         return {
             "week_start": start_date,
             "week_end": end_date,

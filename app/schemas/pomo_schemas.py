@@ -43,12 +43,12 @@ class PomoResponse(BaseModel):
     id: uuid.UUID
     planner_id: Optional[uuid.UUID] = None
     todo_id: Optional[uuid.UUID] = None
-    real_start_time: datetime
-    real_end_time: datetime
+    real_start_time: Optional[datetime] = None
+    real_end_time: Optional[datetime] = None
     category: PomoCategory
     distraction_count: int = 0
-    edit_start_time: datetime
-    edit_end_time: datetime
+    edit_start_time: Optional[datetime] = None
+    edit_end_time: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
 
@@ -58,8 +58,8 @@ class PomoCreateResponse(BaseModel):
     id: uuid.UUID
     planner_id: Optional[uuid.UUID] = None
     todo_id: Optional[uuid.UUID] = None
-    real_start_time: datetime
-    real_end_time: datetime
+    real_start_time: Optional[datetime] = None
+    real_end_time: Optional[datetime] = None
     category: PomoCategory
     distraction_count: int = 0
     created_at: datetime
@@ -71,8 +71,8 @@ class PomoUpdateResponse(BaseModel):
     id: uuid.UUID
     category: PomoCategory
     distraction_count: int = 0
-    edit_start_time: datetime
-    edit_end_time: datetime
+    edit_start_time: Optional[datetime] = None
+    edit_end_time: Optional[datetime] = None
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
