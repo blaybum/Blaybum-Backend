@@ -1,6 +1,6 @@
 import uuid
 from typing import List, Optional
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status, HTTPException, File, UploadFile, Response
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -85,3 +85,26 @@ async def delete_todo(
 ):
     todo_service.delete_todo(db, user, todo_id)
     return
+
+@router.post("/{todo_id}/complete", response_model=ResponseModel[TodoResponse])
+async def complete_todo(
+    todo_id: uuid.UUID,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    user: User = Depends(current_active_user)
+):
+    content = await file.read()
+    result = todo_service.complete_todo(db, user, todo_id, content, file.content_type)
+    return {"success": True, "data": result}
+
+@router.get("/{todo_id}/image")
+async def get_todo_image(
+    todo_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    user: User = Depends(current_active_user)
+):
+    todo = todo_service.get_todo(db, user, todo_id)
+    if not todo.image_data:
+        raise HTTPException(status_code=404, detail="이미지가 없습니다.")
+    
+    return Response(content=todo.image_data, media_type=todo.image_mimetype)

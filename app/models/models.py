@@ -8,7 +8,7 @@ from typing import List
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID, SQLAlchemyBaseOAuthAccountTableUUID
 from sqlalchemy import (
     Boolean, Column, DateTime, ForeignKey, String, Text,
-    Date, Time, Integer, Enum, UniqueConstraint, Index, JSON
+    Date, Time, Integer, Enum, UniqueConstraint, Index, JSON, LargeBinary
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship, Mapped, mapped_column
@@ -129,8 +129,14 @@ class Todo(Base):
     order_index = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    image_data = Column(LargeBinary, nullable=True)
+    image_mimetype = Column(String(50), nullable=True)
 
     planner = relationship("Planner", back_populates="todos")
+
+    @property
+    def has_image(self) -> bool:
+        return self.image_data is not None
 
     __table_args__ = (
         Index('idx_todos_planner', 'planner_id'),

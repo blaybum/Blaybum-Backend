@@ -97,4 +97,16 @@ class TodoService:
         todo = self.get_todo(db, user, todo_id)
         todo_repo.delete(db, todo)
 
+    def complete_todo(self, db: Session, user: User, todo_id: uuid.UUID, image_data: bytes, mimetype: str):
+        todo = self.get_todo(db, user, todo_id)
+        
+        update_data = {
+            "status": "completed",
+            "completed_at": func.now(),
+            "image_data": image_data,
+            "image_mimetype": mimetype
+        }
+        
+        return todo_repo.update(db, todo, update_data)
+
 todo_service = TodoService()
