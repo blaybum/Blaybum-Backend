@@ -192,6 +192,10 @@ class MentoringService:
         mentoring_repo.delete(db, mentoring)
         return mentoring
 
+    def get_mentees(self, db: Session, user: User):
+        """멘토의 멘티 목록 조회"""
+        return mentoring_repo.get_mentees_by_mentor(db, user.id)
+
     def get_mentee_detail(self, db: Session, user: User, mentee_id: uuid.UUID):
         mentoring = mentoring_repo.get_by_mentor_and_mentee(db, user.id, mentee_id)
         if not mentoring:

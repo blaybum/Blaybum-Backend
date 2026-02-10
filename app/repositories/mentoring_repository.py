@@ -129,6 +129,15 @@ class MentoringRepository(BaseRepository[Mentoring]):
             "last_activity": last_activity
         }
 
+    def get_mentees_by_mentor(self, db: Session, mentor_id) -> List[Mentoring]:
+        """멘토의 멘티 목록 조회 (DURING 상태)"""
+        return db.query(Mentoring).options(
+            joinedload(Mentoring.mentee)
+        ).filter(
+            Mentoring.mentor_id == mentor_id,
+            Mentoring.status == MentoringStatus.DURING
+        ).order_by(Mentoring.started_at.desc()).all()
+
     def get_active_mentoring_by_mentor(self, db: Session, mentor_id) -> Optional[Mentoring]:
         return db.query(Mentoring).filter(
             Mentoring.mentor_id == mentor_id,

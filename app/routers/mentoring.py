@@ -22,11 +22,6 @@ from app.auth.permissions import get_current_mentor
 
 router = APIRouter()
 
-
-# ============================================================
-# 멘토링 신청 관리
-# ============================================================
-
 @router.post("/requests", response_model=ResponseModel[MentoringResponse], status_code=status.HTTP_201_CREATED)
 async def create_mentoring_request(
     request: MentoringCreateRequest,
@@ -69,6 +64,28 @@ async def reject_mentoring_request(
 # ============================================================
 # 멘티 관리
 # ============================================================
+
+@router.get("/mentees", response_model=ResponseModel[List[MenteeDetailResponse]])
+async def get_mentees(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_mentor),
+):
+    """멘토의 멘티 목록 조회"""
+    mentorings = mentoring_service.get_mentees(db, user)
+    data = [
+        MenteeDetailResponse(
+            mentee_id=m.mentee.id,
+            username=m.mentee.username,
+            full_name=m.mentee.full_name,
+            profile_image=m.mentee.profile_image,
+            mentoring_id=m.mentoring_id,
+            status=m.status,
+            started_at=m.started_at,
+        )
+        for m in mentorings
+    ]
+    return {"success": True, "data": data}
+
 
 @router.get("/mentees/{mentee_id}", response_model=ResponseModel[MenteeDetailResponse])
 async def get_mentee_detail(
@@ -113,11 +130,6 @@ async def get_mentee_feedbacks(
 ):
     result = mentoring_service.get_mentee_feedbacks(db, user, mentee_id)
     return {"success": True, "data": result}
-
-
-# ============================================================
-# 과제 관리 (Assignment)
-# ============================================================
 
 @router.post(
     "/assignments",
@@ -228,11 +240,6 @@ async def answer_question(
     """질문 답변 (멘토 전용)"""
     result = mentoring_service.answer_question_direct(db, user, question_id, request)
     return {"success": True, "data": result}
-
-
-# ============================================================
-# 멘토링 상태 변경 / 종료 (와일드카드 경로는 마지막에)
-# ============================================================
 
 @router.put("/{mentoring_id}/status", response_model=ResponseModel[MentoringResponse])
 async def update_mentoring_status(
