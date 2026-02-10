@@ -165,6 +165,111 @@ class Pomo(Base):
         Index('idx_pomo_todo', 'todo_id'),
     )
 
+class MentoringStatus(str, enum.Enum):
+    REQUEST = "REQUEST"
+    DURING = "DURING"
+    END = "END"
+
+class AssignmentStatus(str, enum.Enum):
+    ASSIGNED = "ASSIGNED"
+    SUBMITTED = "SUBMITTED"
+    GRADED = "GRADED"
+
+
+class Mentoring(Base):
+    __tablename__ = "mentoring"
+
+    mentoring_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentee_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    mentor_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    status = Column(Enum(MentoringStatus), nullable=False, default=MentoringStatus.REQUEST)
+    requested_at = Column(DateTime(timezone=True), server_default=func.now())
+    started_at = Column(DateTime(timezone=True), nullable=True)
+    ended_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    mentee = relationship("User", foreign_keys=[mentee_id])
+    mentor = relationship("User", foreign_keys=[mentor_id])
+    assignments = relationship("Assignment", back_populates="mentoring", cascade="all, delete-orphan")
+    questions = relationship("MentoringQuestion", back_populates="mentoring", cascade="all, delete-orphan")
+    feedbacks = relationship("MentoringFeedback", back_populates="mentoring", cascade="all, delete-orphan")
+
+    __table_args__ = (
+        Index('idx_mentoring_mentor', 'mentor_id'),
+        Index('idx_mentoring_mentee', 'mentee_id'),
+        Index('idx_mentoring_status', 'status'),
+    )
+
+
+class Assignment(Base):
+    __tablename__ = "assignments"
+
+    assignment_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentoring_id = Column(UUID(as_uuid=True), ForeignKey("mentoring.mentoring_id", ondelete="CASCADE"), nullable=False)
+    title = Column(String(200), nullable=False)
+    description = Column(Text, nullable=True)
+    due_date = Column(DateTime(timezone=True), nullable=True)
+    status = Column(Enum(AssignmentStatus), nullable=False, default=AssignmentStatus.ASSIGNED)
+    grade = Column(Integer, nullable=True)
+    comment = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    mentoring = relationship("Mentoring", back_populates="assignments")
+    submission = relationship("AssignmentSubmission", back_populates="assignment", uselist=False, cascade="all, delete-orphan")
+
+    __table_args__ = (
+        Index('idx_assignments_mentoring', 'mentoring_id'),
+        Index('idx_assignments_status', 'status'),
+    )
+
+
+class AssignmentSubmission(Base):
+    __tablename__ = "assignment_submissions"
+
+    submission_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    assignment_id = Column(UUID(as_uuid=True), ForeignKey("assignments.assignment_id", ondelete="CASCADE"), nullable=False)
+    content = Column(Text, nullable=True)
+    file_url = Column(String(500), nullable=True)
+    submitted_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    assignment = relationship("Assignment", back_populates="submission")
+
+
+class MentoringQuestion(Base):
+    __tablename__ = "mentoring_questions"
+
+    question_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentoring_id = Column(UUID(as_uuid=True), ForeignKey("mentoring.mentoring_id", ondelete="CASCADE"), nullable=False)
+    question = Column(Text, nullable=False)
+    answer = Column(Text, nullable=True)
+    is_answered = Column(Boolean, default=False)
+    asked_at = Column(DateTime(timezone=True), server_default=func.now())
+    answered_at = Column(DateTime(timezone=True), nullable=True)
+
+    mentoring = relationship("Mentoring", back_populates="questions")
+
+    __table_args__ = (
+        Index('idx_questions_mentoring', 'mentoring_id'),
+    )
+
+
+class MentoringFeedback(Base):
+    __tablename__ = "mentoring_feedbacks"
+
+    feedback_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentoring_id = Column(UUID(as_uuid=True), ForeignKey("mentoring.mentoring_id", ondelete="CASCADE"), nullable=False)
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    mentoring = relationship("Mentoring", back_populates="feedbacks")
+
+    __table_args__ = (
+        Index('idx_feedbacks_mentoring', 'mentoring_id'),
+    )
+
+
 class UsageEventType(str, enum.Enum):
     PICK_UP = "PICK_UP"
     PUT_DOWN = "PUT_DOWN"
