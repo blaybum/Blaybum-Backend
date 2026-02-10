@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.routers import planners, todos, statistics, pomo, mentoring
+from app.routers import planners, todos, statistics, pomo
 from app.routers.auth import auth_router
 
 api_v1_router = APIRouter()

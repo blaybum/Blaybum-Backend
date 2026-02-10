@@ -6,19 +6,11 @@ from .models import (
     Todo,
     Pomo,
     Concentration,
-    Mentoring,
-    Assignment,
-    AssignmentSubmission,
-    MentoringQuestion,
-    MentoringFeedback,
     DayOfWeek,
     Priority,
     TodoStatus,
     UsageEventType,
-    PomoCategory,
-    UserRole,
-    MentoringStatus,
-    AssignmentStatus,
+    PomoCategory
 )
 
 __all__ = [
@@ -29,17 +21,9 @@ __all__ = [
     "Todo",
     "Pomo",
     "Concentration",
-    "Mentoring",
-    "Assignment",
-    "AssignmentSubmission",
-    "MentoringQuestion",
-    "MentoringFeedback",
     "DayOfWeek",
     "Priority",
     "TodoStatus",
     "UsageEventType",
     "PomoCategory",
-    "UserRole",
-    "MentoringStatus",
-    "AssignmentStatus",
 ]

@@ -2,8 +2,7 @@
   "permissions": {
     "allow": [
       "Bash(curl:*)",
-      "Bash(python3:*)",
-      "Bash(/Users/kimminje/Desktop/blaybum-backend/.venv/bin/python3:*)"
+      "Bash(python3:*)"
     ]
   }
 }
