@@ -3,12 +3,10 @@ from pydantic import BaseModel
 
 T = TypeVar("T")
 
-#Global Response
 class ResponseModel(BaseModel, Generic[T]):
     success: bool
     data: Optional[T] = None
-   
-# Pagination
+
 class PaginationInfo(BaseModel):
     current_page: int
     total_pages: int

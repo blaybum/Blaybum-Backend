@@ -1,5 +1,4 @@
 import uuid
-import uuid6
 from typing import Optional
 from datetime import date
 import math

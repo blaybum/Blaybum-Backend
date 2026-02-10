@@ -34,6 +34,7 @@ class BaseRepository(Generic[T]):
         return True
 
     def get_pk_name(self):
-        if hasattr(self.model, "planner_id"): return "planner_id"
-        if hasattr(self.model, "todo_id"): return "todo_id"
+        for col in self.model.__table__.columns:
+            if col.primary_key:
+                return col.name
         return "id"
