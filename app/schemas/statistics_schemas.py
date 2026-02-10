@@ -1,8 +1,6 @@
 from typing import Dict, List, Optional
 from pydantic import BaseModel
 from datetime import date
-
-#Sub
 class PriorityStat(BaseModel):
     total: int = 0
     completed: int = 0
@@ -17,7 +15,6 @@ class DailyBreakdown(BaseModel):
     total: int
     completed: int
 
-#Response
 class PlannerDailyStatisticsResponse(BaseModel):
     date: date
     total_todos: int

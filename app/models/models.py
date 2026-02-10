@@ -1,8 +1,6 @@
-import sys
 import uuid
 import enum
 from datetime import datetime
-from pathlib import Path
 from typing import List
 
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID, SQLAlchemyBaseOAuthAccountTableUUID
@@ -40,6 +38,16 @@ class UserRole(str, enum.Enum):
     mentor = "mentor"
     mentee = "mentee"
     admin = "admin"
+
+class MentoringStatus(str, enum.Enum):
+    REQUEST = "REQUEST"
+    DURING = "DURING"
+    END = "END"
+
+class AssignmentStatus(str, enum.Enum):
+    ASSIGNED = "ASSIGNED"
+    SUBMITTED = "SUBMITTED"
+    GRADED = "GRADED"
 
 class OAuthAccount(SQLAlchemyBaseOAuthAccountTableUUID, Base):
     __tablename__ = "oauth_accounts"
@@ -165,6 +173,25 @@ class Pomo(Base):
         Index('idx_pomo_todo', 'todo_id'),
     )
 
+class Mentoring(Base):
+    __tablename__ = "mentoring"
+
+    mentoring_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentee_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    mentor_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    status = Column(Enum(MentoringStatus), nullable=False, default=MentoringStatus.REQUEST)
+    requested_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    started_at = Column(DateTime(timezone=True), nullable=True)
+    ended_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    mentee = relationship("User", foreign_keys=[mentee_id], backref="mentoring_as_mentee")
+    mentor = relationship("User", foreign_keys=[mentor_id], backref="mentoring_as_mentor")
+    assignments = relationship("Assignment", back_populates="mentoring", cascade="all, delete-orphan")
+    questions = relationship("MentoringQuestion", back_populates="mentoring", cascade="all, delete-orphan")
+    feedbacks = relationship("MentoringFeedback", back_populates="mentoring", cascade="all, delete-orphan")
+
 class UsageEventType(str, enum.Enum):
     PICK_UP = "PICK_UP"
     PUT_DOWN = "PUT_DOWN"
@@ -178,3 +205,57 @@ class Concentration(Base):
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
 
     pomo = relationship("Pomo", backref="concentration_logs")
+
+
+class Assignment(Base):
+    __tablename__ = "assignments"
+
+    assignment_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentoring_id = Column(UUID(as_uuid=True), ForeignKey("mentoring.mentoring_id", ondelete="CASCADE"), nullable=False)
+    title = Column(String(200), nullable=False)
+    description = Column(Text, nullable=True)
+    due_date = Column(DateTime(timezone=True), nullable=True)
+    status = Column(Enum(AssignmentStatus), nullable=False, default=AssignmentStatus.ASSIGNED)
+    grade = Column(Integer, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    mentoring = relationship("Mentoring", back_populates="assignments")
+    submissions = relationship("AssignmentSubmission", back_populates="assignment", cascade="all, delete-orphan")
+
+
+class AssignmentSubmission(Base):
+    __tablename__ = "assignment_submissions"
+
+    submission_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    assignment_id = Column(UUID(as_uuid=True), ForeignKey("assignments.assignment_id", ondelete="CASCADE"), nullable=False)
+    content = Column(Text, nullable=True)
+    file_url = Column(String(500), nullable=True)
+    submitted_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    assignment = relationship("Assignment", back_populates="submissions")
+
+
+class MentoringQuestion(Base):
+    __tablename__ = "mentoring_questions"
+
+    question_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentoring_id = Column(UUID(as_uuid=True), ForeignKey("mentoring.mentoring_id", ondelete="CASCADE"), nullable=False)
+    question = Column(Text, nullable=False)
+    answer = Column(Text, nullable=True)
+    is_answered = Column(Boolean, nullable=False, default=False)
+    asked_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    answered_at = Column(DateTime(timezone=True), nullable=True)
+
+    mentoring = relationship("Mentoring", back_populates="questions")
+
+
+class MentoringFeedback(Base):
+    __tablename__ = "mentoring_feedbacks"
+
+    feedback_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentoring_id = Column(UUID(as_uuid=True), ForeignKey("mentoring.mentoring_id", ondelete="CASCADE"), nullable=False)
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    mentoring = relationship("Mentoring", back_populates="feedbacks")

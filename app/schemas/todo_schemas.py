@@ -3,19 +3,14 @@ from datetime import datetime, time
 from enum import Enum
 from pydantic import BaseModel, ConfigDict, Field
 import uuid
-
-#Enum
 class PriorityEnum(str, Enum):
     low = "low"
     medium = "medium"
     high = "high"
 
-#Sub
 class TodoOrder(BaseModel):
     todo_id: uuid.UUID
     order_index: int
-
-#Request
 class TodoCreateRequest(BaseModel):
     planner_id: uuid.UUID
     title: str
@@ -37,7 +32,6 @@ class TodoReorderRequest(BaseModel):
     planner_id: uuid.UUID
     orders: List[TodoOrder]
 
-#Response
 class TodoResponse(BaseModel):
     todo_id: uuid.UUID
     planner_id: uuid.UUID

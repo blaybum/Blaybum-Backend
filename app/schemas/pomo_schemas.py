@@ -5,17 +5,14 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict
 from app.models import PomoCategory
 
-# Enum
 class UsageEventTypeEnum(str, Enum):
     PICK_UP = "PICK_UP"
     PUT_DOWN = "PUT_DOWN"
 
-# Concentration Request
 class ConcentrationCreate(BaseModel):
     event_type: UsageEventTypeEnum
     timestamp: Optional[datetime] = None
 
-# Concentration Response
 class ConcentrationResponse(BaseModel):
     id: uuid.UUID
     pomo_id: uuid.UUID
@@ -24,7 +21,6 @@ class ConcentrationResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-# Pomo Request
 class PomoCreateRequest(BaseModel):
     planner_id: Optional[uuid.UUID] = None
     todo_id: Optional[uuid.UUID] = None
@@ -38,7 +34,6 @@ class PomoUpdateRequest(BaseModel):
     edit_start_time: Optional[datetime] = None
     edit_end_time: Optional[datetime] = None
 
-# Pomo Response
 class PomoResponse(BaseModel):
     id: uuid.UUID
     planner_id: Optional[uuid.UUID] = None
